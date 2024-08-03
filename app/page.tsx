@@ -9,6 +9,7 @@ interface UserData {
   username?: string;
   language_code: string;
   is_premium: boolean;
+  photo_url?: string;
 }
 
 export default function Home() {
@@ -36,6 +37,7 @@ export default function Home() {
             <li>Last Name: {userData.last_name || "N/A"}</li>
             <li>Username: {userData.username || "N/A"}</li>
             <li>Language Code: {userData.language_code}</li>
+            <li>Photo: {userData.photo_url}</li>
             <li>Premium Status: {userData.is_premium ? "Yes" : "No"}</li>
           </ul>
           <div className="mt-4">
