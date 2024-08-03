@@ -12,10 +12,11 @@ interface UserData {
 }
 export default function Home() {
   const [userData, setUserData] = useState<UserData | null>(null);
-  
+
   useEffect(() => {
     if (WebApp.initDataUnsafe.user) {
       setUserData(WebApp.initDataUnsafe.user as UserData);
+      console.log('web app',WebApp);
     }
   }, []);
   return (
@@ -31,7 +32,7 @@ export default function Home() {
             <li>Language Code: {userData.language_code}</li>
             <li>Premium Status: {userData.is_premium ? "Yes" : "No"}</li>
           </ul>
-          {JSON.stringify(WebApp)}
+          
         </>
       ) : (
         <>
