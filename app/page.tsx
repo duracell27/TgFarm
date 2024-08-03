@@ -30,6 +30,7 @@ export default function Home() {
             <li>Language Code: {userData.language_code}</li>
             <li>Premium Status: {userData.is_premium ? "Yes" : "No"}</li>
           </ul>
+          {JSON.stringify(WebApp)}
         </>
       ) : (
         <>
