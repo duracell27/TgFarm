@@ -1,28 +1,37 @@
+import axios from "axios";
 import create from "zustand";
 
 interface State {
-  user: {
-    tgid: number;
+  userData: {
+    userId: number;
     firstName: string;
     lastName: string;
     userName: string;
     languageCode: string;
     isPremium: boolean;
-  } | null;
-  userData: {
     gold: number;
     usd: number;
+    lvl: number;
+    exp: number;
+    lastLogin: Date
   } | null;
+  getUserData: (userData: {}) => void;
 }
 //   increase: () => void;
 //   decrease: () => void;
 
-const useStore = create<State>((set) => ({
-  user: null,
+const useUserStore = create<State>((set) => ({
   userData: null,
+  getUserData: async (userData) => {
+    console.log('Я виклакалась')
+    const response = await axios.post("/api/user", userData );
+    if(response.status === 200){
+      set({ userData: response.data });
+    }
+  },
 }));
 
 //   increase: () => set((state) => ({ count: state.count + 1 })),
 //   decrease: () => set((state) => ({ count: state.count - 1 })),
 
-export default useStore;
+export default useUserStore;

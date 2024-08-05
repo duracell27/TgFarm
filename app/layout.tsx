@@ -20,7 +20,7 @@ export default function RootLayout({
     <head>
       <Script src="https://telegram.org/js/telegram-web-app.js" strategy="beforeInteractive"/>
     </head>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className + ' bg-black'}>{children}</body>
     </html>
   );
 }
