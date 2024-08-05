@@ -19,7 +19,7 @@ export const Header: React.FC<HederProps> = ({ name, gold, usd, lvl }) => {
   return (
     <div className="flex justify-between items-center text-yellow-500">
       <div className="flex-shrink overflow-hidden max-w-full">
-        <p className="truncate font-bold">{name} сівлдмлд івтсмтіва сфівсфів</p>
+        <p className="truncate font-bold">@{name}</p>
       </div>
       <div className="flex ml-2 gap-2 items-center flex-shrink-0">
         <div className="flex gap-1 items-center">
