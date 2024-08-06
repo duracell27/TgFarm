@@ -12,7 +12,9 @@ const UserSchema = new mongoose.Schema(
     usd: {type: Number, default: 100},
     lvl: {type: Number, default: 1},
     exp: {type: Number, default: 0},
-    lastLogin: Date
+    lastLogin: Date,
+    defaultSeed: { type: mongoose.Schema.Types.ObjectId, ref: 'Seed', default: null },
+    defaultSoil: { type: mongoose.Schema.Types.ObjectId, ref: 'Soil', default: null }
   },
   {
     timestamps: true,

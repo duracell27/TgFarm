@@ -1,7 +1,8 @@
 import axios from "axios";
-import {create} from "zustand";
+import { create } from "zustand";
+import { ObjectId } from "bson";
 
-interface State {
+interface UserState {
   userData: {
     userId: number;
     firstName: string;
@@ -13,25 +14,67 @@ interface State {
     usd: number;
     lvl: number;
     exp: number;
-    lastLogin: Date
+    lastLogin: Date;
+    defaultSeed: Seed | null;
+    defaultSoil: Soil | null;
   } | null;
   getUserData: (userData: {}) => void;
 }
-//   increase: () => void;
-//   decrease: () => void;
 
-const useUserStore = create<State>((set) => ({
+interface Seed {
+  _id: ObjectId;
+  name: string;
+  price: number;
+  timeToHarvest: number;
+  timeToFertilize: number;
+  profit: number;
+  exp: number;
+  quantity: number;
+  imageUrl: string;
+  lvl: number;
+}
+
+interface Soil {
+  _id: ObjectId;
+  name: string;
+  price: number;
+  priceType: string;
+  reduceTime: number;
+  exp: number;
+  imageUrl: string;
+  lvl: number;
+}
+
+interface DefaultState {
+  seeds: Seed[] | null;
+  soils: Soil[] | null;
+  getSeeds: () => void;
+  getSoils: () => void;
+}
+
+export const useUserStore = create<UserState>((set) => ({
   userData: null,
   getUserData: async (userData) => {
-    console.log('Я виклакалась')
-    const response = await axios.post("/api/user", userData );
-    if(response.status === 200){
+    const response = await axios.post("/api/user", userData);
+    if (response.status === 200) {
       set({ userData: response.data });
     }
   },
 }));
 
-//   increase: () => set((state) => ({ count: state.count + 1 })),
-//   decrease: () => set((state) => ({ count: state.count - 1 })),
-
-export default useUserStore;
+export const useDefaultStore = create<DefaultState>((set) => ({
+  seeds: null,
+  soils: null,
+  getSeeds: async () => {
+    const response = await axios.get("/api/seed");
+    if (response.status === 200) {
+      set({ seeds: response.data });
+    }
+  },
+  getSoils: async () => {
+    const response = await axios.get("/api/soil");
+    if (response.status === 200) {
+      set({ soils: response.data });
+    }
+  },
+}));

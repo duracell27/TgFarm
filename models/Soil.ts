@@ -4,11 +4,9 @@ const SoilSchema = new mongoose.Schema(
   {
     name: String,
     price: Number,
-    timeToHarvest: Number,
-    timeToFertilize: Number,
-    profit: Number,
+    priceType: {type: String, enum: ['gold', "usd"]},
+    reduceTime: Number,
     exp: Number,
-    quantity: Number,
     imageUrl: String,
     lvl: Number
   },
@@ -17,4 +15,4 @@ const SoilSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.models.Seed || mongoose.model("Seed", SoilSchema);
+export default mongoose.models.Soil || mongoose.model("Soil", SoilSchema);
