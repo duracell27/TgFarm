@@ -1,3 +1,4 @@
+import Image from "next/image";
 import React from "react";
 
 type HederProps = {
@@ -23,29 +24,35 @@ export const Header: React.FC<HederProps> = ({ name, gold, usd, lvl }) => {
       </div>
       <div className="flex ml-2 gap-2 items-center flex-shrink-0">
         <div className="flex gap-1 items-center">
-          <img
+          <Image
             src={"/images/icons/gold.png"}
-            className="size-4 block"
+            className="block"
+            width={16}
+            height={16}
             alt="gold"
           />{" "}
           <p className="block">{gold}</p>
         </div>
         <div className="flex gap-1 items-center">
-          <img
+          <Image
             src={"/images/icons/usd.png"}
-            className="size-4 block"
+            className="block"
+            width={16}
+            height={16}
             alt="usd"
           />
           <p className="block">{usd}</p>
         </div>
         <div className="flex gap-1 items-center">
-          <img
+          <Image
             src={
               lvl < 30
                 ? "/images/icons/user1lvl.png"
                 : "/images/icons/user30lvl.png"
             }
-            className="size-4 block"
+            width={16}
+            height={16}
+            className=" block"
             alt="gold"
           />{" "}
           <p className="block">{lvl}</p>
