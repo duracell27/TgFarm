@@ -2,16 +2,21 @@ import connectDB from "@/libs/connectDb";
 import Soil from "@/models/Soil";
 import { NextRequest, NextResponse } from "next/server";
 
-const soils = [
-  {name: "Торф", price: 1, priceType: "gold", reduceTime: 1800, exp: 1, imageUrl: "torf.png", lvl: 1},
-  {name: "Компост", price: 50, priceType: "gold", reduceTime: 7200, exp: 2, imageUrl: "kompost.png", lvl: 7},
-  {name: "Азот", price: 200, priceType: "gold", reduceTime: 21600, exp: 4, imageUrl: "azot.png", lvl: 15},
-  {name: "Суперфосфат", price: 2000, priceType: "gold", reduceTime: 32400, exp: 40, imageUrl: "superfosfat.png", lvl: 25},
-  {name: "Сульфат", price: 500, priceType: "gold", reduceTime: 32400, exp: 10, imageUrl: "sulfat.png", lvl: 20},
-  {name: "Магнезит", price: 1000, priceType: "gold", reduceTime: 54000, exp: 70, imageUrl: "magnesit.png", lvl: 35},
-  {name: "Коровяк", price: 1, priceType: "usd", reduceTime: 86400, exp: 100, imageUrl: "korovyak.png", lvl: 15},
-  {name: "Біоплант", price: 10000, priceType: "gold", reduceTime: 172800, exp: 300, imageUrl: "bioplant.png", lvl: 40},
-];
+// const soils = [
+//   {name: "Торф", price: 1, priceType: "gold", reduceTime: 1800, exp: 1, imageUrl: "torf.png", lvl: 1},
+//   {name: "Компост", price: 50, priceType: "gold", reduceTime: 7200, exp: 2, imageUrl: "kompost.png", lvl: 7},
+//   {name: "Азот", price: 200, priceType: "gold", reduceTime: 21600, exp: 4, imageUrl: "azot.png", lvl: 15},
+//   {name: "Суперфосфат", price: 2000, priceType: "gold", reduceTime: 32400, exp: 40, imageUrl: "superfosfat.png", lvl: 25},
+//   {name: "Сульфат", price: 500, priceType: "gold", reduceTime: 32400, exp: 10, imageUrl: "sulfat.png", lvl: 20},
+//   {name: "Магнезит", price: 1000, priceType: "gold", reduceTime: 54000, exp: 70, imageUrl: "magnesit.png", lvl: 35},
+//   {name: "Коровяк", price: 1, priceType: "usd", reduceTime: 86400, exp: 100, imageUrl: "korovyak.png", lvl: 15},
+//   {name: "Біоплант", price: 10000, priceType: "gold", reduceTime: 172800, exp: 300, imageUrl: "bioplant.png", lvl: 40},
+// ];
+
+// const soils1 = [
+//     {name: "Пусто", price: 0, priceType: "gold", reduceTime: 0, exp: 0, imageUrl: "empty.jpg", lvl: 1},
+//   ];
+  
 
 // export const POST = async (req: NextRequest) => {
 //   // const data = await req.json();
@@ -19,7 +24,7 @@ const soils = [
 //   try {
 //     await connectDB();
 
-//     const response = await Soil.insertMany(soils);
+//     const response = await Soil.insertMany(soils1);
 
 //     return NextResponse.json(response,{ status: 200 });
 //   } catch (error) {
@@ -33,7 +38,7 @@ export const GET = async (req: NextRequest) => {
     try {
         await connectDB()
 
-        const response = await Soil.find()
+        const response = await Soil.find().sort({lvl: "asc"})
 
         return NextResponse.json(response, { status: 200 });
         

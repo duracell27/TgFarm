@@ -52,6 +52,19 @@ interface DefaultState {
   getSoils: () => void;
 }
 
+interface Field {
+  userId: number,
+    ordinalNumber: number,
+    seed: Seed | null,
+    timeToWater: number | null,
+    status: 'waitForPlant' | 'waitForWater' | 'waitForFertilize' | 'waitForHarvest' | 'waitForDig'
+}
+
+interface FieldState {
+  fields: Field[] | null,
+  getFields: (userId:number) => void;
+}
+
 export const useUserStore = create<UserState>((set) => ({
   userData: null,
   getUserData: async (userData) => {
@@ -78,3 +91,16 @@ export const useDefaultStore = create<DefaultState>((set) => ({
     }
   },
 }));
+
+
+export const useFieldtStore = create<FieldState>((set) => ({
+  fields: null,
+  getFields: async (userId) => {
+    const response = await axios.get("/api/fields", {
+      params: { userId }
+    });
+    if (response.status === 200) {
+      set({ fields: response.data });
+    }
+  } 
+}))

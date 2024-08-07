@@ -21,8 +21,12 @@ const ChooseDefaultSeed = (props: Props) => {
   }
   return (
     <div className="text-yellow-500 p-2 pt-0">
-      {seeds.map((seed, index) => (
-        <div
+      {seeds.map((seed, index) => {
+        if(seed.name === 'Пусто'){
+          return null;
+        }else{
+          return (
+            <div
           key={index}
           className={
             (userData.lvl < seed.lvl ? "bg-slate-700 " : "bg-slate-900 ") +
@@ -97,7 +101,10 @@ const ChooseDefaultSeed = (props: Props) => {
             </div>
           </div>
         </div>
-      ))}
+          )
+        }
+        
+})}
     </div>
   );
 };

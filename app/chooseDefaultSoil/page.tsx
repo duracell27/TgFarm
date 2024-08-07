@@ -21,8 +21,12 @@ const ChooseDefaultSoil = (props: Props) => {
 
   return (
     <div className="text-yellow-500 p-2 pt-0">
-      {soils.map((soil, index) => (
-        <div
+      {soils.map((soil, index) => {
+        if(soil.name === 'Пусто'){
+          return null;
+        }else{
+          return (
+            <div
           key={index}
           className={
             (userData.lvl < soil.lvl ? "bg-slate-700 " : "bg-slate-900 ") +
@@ -81,7 +85,10 @@ const ChooseDefaultSoil = (props: Props) => {
             </p>
           </div>
         </div>
-      ))}
+          )
+        }
+        
+})}
       <div className="text-sm">
         <p className="">
           <Image 

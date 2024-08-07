@@ -34,18 +34,18 @@ const lvls = [
     { lvl: 30, needExp: 2141000 },
 ]
 
-export const POST = async () => {
+// export const POST = async () => {
     
    
-    try {
-        await connectDB()
+//     try {
+//         await connectDB()
 
-        const response = await Lvl.insertMany(lvls)
+//         const response = await Lvl.insertMany(lvls)
 
-        return NextResponse.json(response, { status: 200 });
+//         return NextResponse.json(response, { status: 200 });
         
-    } catch (error) {
-        console.log(error);
-        return NextResponse.json({ error: "Failed to add seed" }, { status: 500 });
-    }
-}
+//     } catch (error) {
+//         console.log(error);
+//         return NextResponse.json({ error: "Failed to add seed" }, { status: 500 });
+//     }
+// }

@@ -52,18 +52,18 @@ const fields = [
     { ordinal: 50, costUsd: 1000 },
 ]
 
-export const POST = async () => {
+// export const POST = async () => {
     
    
-    try {
-        await connectDB()
+//     try {
+//         await connectDB()
 
-        const response = await FieldPrice.insertMany(fields)
+//         const response = await FieldPrice.insertMany(fields)
 
-        return NextResponse.json(response, { status: 200 });
+//         return NextResponse.json(response, { status: 200 });
         
-    } catch (error) {
-        console.log(error);
-        return NextResponse.json({ error: "Failed to add seed" }, { status: 500 });
-    }
-}
+//     } catch (error) {
+//         console.log(error);
+//         return NextResponse.json({ error: "Failed to add seed" }, { status: 500 });
+//     }
+// }
