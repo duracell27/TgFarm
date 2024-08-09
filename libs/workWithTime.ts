@@ -26,3 +26,16 @@ export function formatTime(seconds: number): string {
     return `${days} ${getDeclension(days, 'день', 'дні', 'днів')}${remainingHours > 0 ? ` і ${remainingHours} ${getDeclension(remainingHours, 'година', 'години', 'годин')}` : ''}`;
   }
 }
+
+export function remainingTime(date: Date): string {
+  const convertedDate = new Date(date)
+  if(convertedDate){
+    
+    const providedDate = convertedDate.getTime();
+    const currentDate = new Date().getTime();
+    const differenceInSeconds = Math.floor(( providedDate - currentDate) / 1000);
+    
+    return formatTime(differenceInSeconds);
+  }
+  return '';
+}

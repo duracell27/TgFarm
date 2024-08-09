@@ -1,15 +1,25 @@
 "use client";
 import { formatTime } from "@/libs/workWithTime";
 import { useDefaultStore, useUserStore } from "@/store/store";
+import { ObjectId } from "bson";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 
 type Props = {};
 
 const ChooseDefaultSoil = (props: Props) => {
   const userData = useUserStore((state) => state.userData);
+  const setDefaultSoil = useUserStore(state=>state.setDefaultSoil)
   const soils = useDefaultStore((state) => state.soils);
   const getSoils = useDefaultStore((state) => state.getSoils);
+
+  const router = useRouter();
+
+  const handleSetDefaultSeed = async (id: ObjectId) => {
+    setDefaultSoil(id);
+   router.push('/');
+  };
 
   useEffect(() => {
     getSoils();
@@ -28,9 +38,10 @@ const ChooseDefaultSoil = (props: Props) => {
           return (
             <div
           key={index}
+          onClick={()=>handleSetDefaultSeed(soil._id)}
           className={
             (userData.lvl < soil.lvl ? "bg-slate-700 " : "bg-slate-900 ") +
-            " flex gap-2 py-1 my-2 rounded-md"
+            " flex gap-2 py-1 my-2 rounded-md cursor-pointer"
           }
         >
           <div className="">

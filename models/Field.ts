@@ -7,7 +7,9 @@ const FieldSchema = new mongoose.Schema(
     userId: Number,
     ordinalNumber: Number,
     seed: { type: mongoose.Schema.Types.ObjectId, ref: Seed.modelName, default: seedEmptyId },
-    timeToWater: {type: Number,  default: null},
+    timeToWater: {type: Date,  default: null},
+    timeToFertilize: {type: Date,  default: null},
+    timeToHarvest: {type: Date,  default: null},
     status: {type: String, enum: ['waitForPlant','waitForWater', 'waitForFertilize','waitForHervest', 'waitForDig'], default: 'waitForPlant'}
   },
   {

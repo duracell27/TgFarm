@@ -20,6 +20,7 @@ export const Header: React.FC<HederProps> = ({ name, gold, usd, lvl }) => {
   }
   return (
     <Link href={"/"} className="">
+      <div className="text-yellow-500 text-[8px]">beta ver. 0.002</div>
       <div className="flex justify-between items-center text-yellow-500 p-2 pb-0">
         <div className="flex-shrink overflow-hidden max-w-full">
           <p className="truncate font-bold">@{name}</p>

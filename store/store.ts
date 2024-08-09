@@ -15,12 +15,13 @@ interface UserState {
     lvl: number;
     exp: number;
     lastLogin: Date;
-    defaultSeed: Seed | null;
-    defaultSoil: Soil | null;
+    defaultSeed: Seed;
+    defaultSoil: Soil;
   } | null;
   getUserData: (userData: {}) => void;
   setDefaultSeed: (defaultSeedId: ObjectId) => void;
-  reNewUser: ()=>void;
+  setDefaultSoil: (defaultSoilId: ObjectId) => void;
+  reNewUser: () => void;
 }
 
 interface Seed {
@@ -55,19 +56,28 @@ interface DefaultState {
 }
 
 interface Field {
-  userId: number,
-    ordinalNumber: number,
-    seed: Seed | null,
-    timeToWater: number | null,
-    status: 'waitForPlant' | 'waitForWater' | 'waitForFertilize' | 'waitForHarvest' | 'waitForDig'
+  _id: ObjectId;
+  userId: number;
+  ordinalNumber: number;
+  seed: Seed | null;
+  timeToWater: Date | null;
+  timeToFertilize: Date | null
+  timeToHarvest: Date | null;
+  status:
+    | "waitForPlant"
+    | "waitForWater"
+    | "waitForFertilize"
+    | "waitForHarvest"
+    | "waitForDig";
 }
 
 interface FieldState {
-  fields: Field[] | null,
-  getFields: (userId:number) => void;
+  fields: Field[] | null;
+  getFields: (userId: number) => void;
+  updateField: (fieldId:ObjectId, seedId:ObjectId, fieldUpdateType: 'plant'|'water' |'fertilize', soilId:ObjectId) => void
 }
 
-export const useUserStore = create<UserState>((set,get) => ({
+export const useUserStore = create<UserState>((set, get) => ({
   userData: null,
   getUserData: async (userData) => {
     const response = await axios.post("/api/user", userData);
@@ -77,9 +87,9 @@ export const useUserStore = create<UserState>((set,get) => ({
   },
   reNewUser: async () => {
     const { userData } = get();
-    if(userData && userData.userId){
+    if (userData && userData.userId) {
       const response = await axios.get("/api/user", {
-        params: { userId: userData.userId }
+        params: { userId: userData.userId },
       });
       if (response.status === 200) {
         set({ userData: response.data });
@@ -88,15 +98,30 @@ export const useUserStore = create<UserState>((set,get) => ({
   },
   setDefaultSeed: async (defaultSeedId) => {
     const { userData, reNewUser } = get();
-    if(userData && userData.userId){
-      const response = await axios.put("/api/user", {defaultSeedId, userId: userData.userId});
+    if (userData && userData.userId) {
+      const response = await axios.put("/api/user", {
+        defaultSeedId,
+        userId: userData.userId,
+        defType: "seed",
+      });
       if (response.status === 200) {
-        await reNewUser();
+        reNewUser();
       }
     }
-    
-  }
-
+  },
+  setDefaultSoil: async (defaultSoilId) => {
+    const { userData, reNewUser } = get();
+    if (userData && userData.userId) {
+      const response = await axios.put("/api/user", {
+        defaultSoilId,
+        userId: userData.userId,
+        defType: "soil",
+      });
+      if (response.status === 200) {
+        reNewUser();
+      }
+    }
+  },
 }));
 
 export const useDefaultStore = create<DefaultState>((set) => ({
@@ -116,15 +141,26 @@ export const useDefaultStore = create<DefaultState>((set) => ({
   },
 }));
 
-
-export const useFieldtStore = create<FieldState>((set) => ({
+export const useFieldtStore = create<FieldState>((set, get) => ({
   fields: null,
   getFields: async (userId) => {
     const response = await axios.get("/api/fields", {
-      params: { userId }
+      params: { userId },
     });
     if (response.status === 200) {
       set({ fields: response.data });
     }
-  } 
-}))
+  },
+  updateField: async (fieldId,seedId,fieldUpdateType,soilId)=>{
+  
+    const {getFields} = get()
+    const { userData } = useUserStore.getState();
+
+    const response = await axios.put("/api/fields", {fieldId, seedId,fieldUpdateType,soilId});
+    if (response.status === 200) {
+      if(userData){
+        getFields(userData.userId)
+      }
+    }
+  }
+}));

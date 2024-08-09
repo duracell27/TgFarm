@@ -1,10 +1,16 @@
 import connectDB from "@/libs/connectDb";
 import User from "@/models/User";
 import Field from "@/models/Field";
-import Seed from "@/models/Seed";
-import Soil from "@/models/Soil";
+import { ObjectId } from "bson";
 import { NextRequest, NextResponse } from "next/server";
 import { seedEmptyId } from "@/libs/constants";
+
+interface UpdateUserRequestData {
+  defaultSeedId: ObjectId ; // Use ObjectId for MongoDB, or string if it’s coming as a string
+  defaultSoilId: ObjectId ;
+  userId: number;
+  defType: 'seed' | 'soil'; // Limited to 'seed' or 'soil'
+}
 
 export const GET = async (req: NextRequest) => {
   const { searchParams } = new URL(req.url);
@@ -86,20 +92,33 @@ export const POST = async (req: NextRequest) => {
 };
 
 export const PUT = async (req: NextRequest) => {
-  const data = await req.json();
-  const defaultSeedId = data.defaultSeedId;
-  const userId = data.userId;
-
+  const data: UpdateUserRequestData = await req.json();
+  const { defaultSeedId, defaultSoilId, userId, defType } = data;
   try {
-    const updatedUser = await User.findOneAndUpdate(
-      { userId },
-      {
-        defaultSeed: defaultSeedId,
-        lastLogin: new Date(), // Update lastLogin to the current date and time
-      }
-    );
 
-    return NextResponse.json(updatedUser);
+    if(defType === 'seed'){
+      const updatedUser = await User.findOneAndUpdate(
+        { userId },
+        {
+          defaultSeed: defaultSeedId,
+          lastLogin: new Date(), // Update lastLogin to the current date and time
+        }
+      );
+  
+      return NextResponse.json(updatedUser);
+    }else if(defType === 'soil'){
+      const updatedUser = await User.findOneAndUpdate(
+        { userId },
+        {
+          defaultSoil: defaultSoilId,
+          lastLogin: new Date(), // Update lastLogin to the current date and time
+        }
+      );
+  
+      return NextResponse.json(updatedUser);
+    }
+
+    
   } catch (error) {
     console.log("from user api post", error);
   }
