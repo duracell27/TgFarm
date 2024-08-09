@@ -1,5 +1,8 @@
 import { seedEmptyId, soilEmptyId } from "@/libs/constants";
 import mongoose from "mongoose";
+import Seed from "./Seed";
+import Soil from "./Soil";
+
 
 const UserSchema = new mongoose.Schema(
   {
@@ -14,8 +17,8 @@ const UserSchema = new mongoose.Schema(
     lvl: {type: Number, default: 1},
     exp: {type: Number, default: 0},
     lastLogin: Date,
-    defaultSeed: { type: mongoose.Schema.Types.ObjectId, ref: 'Seed', default: seedEmptyId },
-    defaultSoil: { type: mongoose.Schema.Types.ObjectId, ref: 'Soil', default: soilEmptyId }
+    defaultSeed: { type: mongoose.Schema.Types.ObjectId, ref: Seed.modelName, default: seedEmptyId, required: [true, 'Seed must belong to a user'] },
+    defaultSoil: { type: mongoose.Schema.Types.ObjectId, ref: Soil.modelName, default: soilEmptyId, required: [true, 'Seed must belong to a user'] }
   },
   {
     timestamps: true,

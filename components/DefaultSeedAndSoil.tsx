@@ -9,7 +9,7 @@ const DefaultSeedAndSoil = (props: Props) => {
   const userData = useUserStore((state) => state.userData);
   return (
     <div className="text-yellow-500">
-      {userData?.defaultSeed ? (
+      {(userData?.defaultSeed && userData.defaultSeed.name !== 'Пусто') ? (
         <div className="flex items-center gap-2">
           <Image
             src={"/images/icons/seed.png"}
@@ -29,7 +29,7 @@ const DefaultSeedAndSoil = (props: Props) => {
         </div>
       )}
 
-      {userData?.defaultSoil ? (
+      {(userData?.defaultSoil && userData.defaultSoil.name !== 'Пусто') ? (
         <div className="flex items-center gap-2">
           <Image
             src={"/images/icons/soil.png"}

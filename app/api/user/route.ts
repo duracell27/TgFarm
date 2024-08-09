@@ -1,18 +1,21 @@
 import connectDB from "@/libs/connectDb";
-import { seedEmptyId } from "@/libs/constants";
+import User from "@/models/User";
 import Field from "@/models/Field";
 import Seed from "@/models/Seed";
 import Soil from "@/models/Soil";
-import User from "@/models/User";
 import { NextRequest, NextResponse } from "next/server";
+import { seedEmptyId } from "@/libs/constants";
 
-// export const GET = async() =>{
+export const GET = async (req: NextRequest) => {
+  const { searchParams } = new URL(req.url);
+  const userId = searchParams.get("userId");
 
-//     const users = await prisma.user.findMany()
+  const user = await User.findOne({ userId }).populate(
+    "defaultSeed defaultSoil"
+  );
 
-//     return NextResponse.json(users)
-// }
-
+  return NextResponse.json(user);
+};
 
 export const POST = async (req: NextRequest) => {
   const data = await req.json();
@@ -22,7 +25,9 @@ export const POST = async (req: NextRequest) => {
     await connectDB();
 
     //check for user, if exists return user else create in db
-    const user = await User.findOne({ userId }).populate('defaultSeed defaultSoil')
+    const user = await User.findOne({ userId }).populate(
+      "defaultSeed defaultSoil"
+    );
     if (user) {
       //беремо дані користувача і новляємо останній вхід
       user.lastLogin = new Date();
@@ -75,6 +80,26 @@ export const POST = async (req: NextRequest) => {
       ]);
       return NextResponse.json(newUser);
     }
+  } catch (error) {
+    console.log("from user api post", error);
+  }
+};
+
+export const PUT = async (req: NextRequest) => {
+  const data = await req.json();
+  const defaultSeedId = data.defaultSeedId;
+  const userId = data.userId;
+
+  try {
+    const updatedUser = await User.findOneAndUpdate(
+      { userId },
+      {
+        defaultSeed: defaultSeedId,
+        lastLogin: new Date(), // Update lastLogin to the current date and time
+      }
+    );
+
+    return NextResponse.json(updatedUser);
   } catch (error) {
     console.log("from user api post", error);
   }

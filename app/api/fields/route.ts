@@ -1,5 +1,5 @@
-import connectDB from "@/libs/connectDb";
 import Field from "@/models/Field";
+import connectDB from "@/libs/connectDb";
 
 import { NextRequest, NextResponse } from "next/server";
 

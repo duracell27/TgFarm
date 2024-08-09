@@ -1,6 +1,7 @@
 "use client";
 import { useFieldtStore, useUserStore } from "@/store/store";
 import Image from "next/image";
+import Link from "next/link";
 import React, { useEffect } from "react";
 
 type Props = {};
@@ -61,7 +62,9 @@ const Fields = (props: Props) => {
               field.status === "waitForFertilize" ||
               field.status === "waitForHarvest") && <p>{field.seed?.name}</p>}
             {/* встановлення опису заголовку відностно статусу кінець */}
-
+              
+              {field.status === 'waitForPlant' && userData?.defaultSeed?.name === "Пусто" && (<Link className="flex items-center gap-1" href={'/chooseDefaultSeed'}><Image src={'/images/icons/seed.png'} width={16} height={16} alt="seed"/>Посадити</Link>)}
+              {field.status === 'waitForPlant' && userData?.defaultSeed?.name !== "Пусто" && (<button>Посадити {userData?.defaultSeed?.name}</button>)}
             
           </div>
         </div>

@@ -19,6 +19,8 @@ interface UserState {
     defaultSoil: Soil | null;
   } | null;
   getUserData: (userData: {}) => void;
+  setDefaultSeed: (defaultSeedId: ObjectId) => void;
+  reNewUser: ()=>void;
 }
 
 interface Seed {
@@ -65,7 +67,7 @@ interface FieldState {
   getFields: (userId:number) => void;
 }
 
-export const useUserStore = create<UserState>((set) => ({
+export const useUserStore = create<UserState>((set,get) => ({
   userData: null,
   getUserData: async (userData) => {
     const response = await axios.post("/api/user", userData);
@@ -73,6 +75,28 @@ export const useUserStore = create<UserState>((set) => ({
       set({ userData: response.data });
     }
   },
+  reNewUser: async () => {
+    const { userData } = get();
+    if(userData && userData.userId){
+      const response = await axios.get("/api/user", {
+        params: { userId: userData.userId }
+      });
+      if (response.status === 200) {
+        set({ userData: response.data });
+      }
+    }
+  },
+  setDefaultSeed: async (defaultSeedId) => {
+    const { userData, reNewUser } = get();
+    if(userData && userData.userId){
+      const response = await axios.put("/api/user", {defaultSeedId, userId: userData.userId});
+      if (response.status === 200) {
+        await reNewUser();
+      }
+    }
+    
+  }
+
 }));
 
 export const useDefaultStore = create<DefaultState>((set) => ({
