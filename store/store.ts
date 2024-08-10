@@ -61,7 +61,7 @@ interface Field {
   ordinalNumber: number;
   seed: Seed | null;
   timeToWater: Date | null;
-  timeToFertilize: Date | null
+  timeToFertilize: Date | null;
   timeToHarvest: Date | null;
   status:
     | "waitForPlant"
@@ -74,7 +74,12 @@ interface Field {
 interface FieldState {
   fields: Field[] | null;
   getFields: (userId: number) => void;
-  updateField: (fieldId:ObjectId, seedId:ObjectId, fieldUpdateType: 'plant'|'water' |'fertilize', soilId:ObjectId) => void
+  updateField: (
+    fieldId: ObjectId,
+    seedId: ObjectId,
+    fieldUpdateType: "plant" | "water" | "fertilize" | "harvest" | "dig",
+    soilId: ObjectId
+  ) => void;
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
@@ -85,6 +90,7 @@ export const useUserStore = create<UserState>((set, get) => ({
       set({ userData: response.data });
     }
   },
+
   reNewUser: async () => {
     const { userData } = get();
     if (userData && userData.userId) {
@@ -96,6 +102,7 @@ export const useUserStore = create<UserState>((set, get) => ({
       }
     }
   },
+
   setDefaultSeed: async (defaultSeedId) => {
     const { userData, reNewUser } = get();
     if (userData && userData.userId) {
@@ -109,6 +116,7 @@ export const useUserStore = create<UserState>((set, get) => ({
       }
     }
   },
+
   setDefaultSoil: async (defaultSoilId) => {
     const { userData, reNewUser } = get();
     if (userData && userData.userId) {
@@ -151,16 +159,20 @@ export const useFieldtStore = create<FieldState>((set, get) => ({
       set({ fields: response.data });
     }
   },
-  updateField: async (fieldId,seedId,fieldUpdateType,soilId)=>{
-  
-    const {getFields} = get()
+  updateField: async (fieldId, seedId, fieldUpdateType, soilId) => {
+    const { getFields } = get();
     const { userData } = useUserStore.getState();
 
-    const response = await axios.put("/api/fields", {fieldId, seedId,fieldUpdateType,soilId});
+    const response = await axios.put("/api/fields", {
+      fieldId,
+      seedId,
+      fieldUpdateType,
+      soilId,
+    });
     if (response.status === 200) {
-      if(userData){
-        getFields(userData.userId)
+      if (userData) {
+        getFields(userData.userId);
       }
     }
-  }
+  },
 }));

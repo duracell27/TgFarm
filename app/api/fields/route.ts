@@ -5,6 +5,7 @@ import { ObjectId } from "bson";
 import { NextRequest, NextResponse } from "next/server";
 import Seed from "@/models/Seed";
 import Soil from "@/models/Soil";
+import { seedEmptyId } from "@/libs/constants";
 
 interface UpdateFieldType {
   fieldId: ObjectId;
@@ -115,8 +116,41 @@ export const PUT = async (req: NextRequest) => {
           status: 'waitForHarvest',
           timeToHarvest: reducedTimeToHarvest
         }
+      );
+  
+      return NextResponse.json({message: 'Field fertilized'});
+    }else if(fieldUpdateType === 'harvest'){
+  
+
+      const response = await Field.findOneAndUpdate(
+        { _id: fieldId },
+        {
+          status: 'waitForDig',
+          timeToHarvest: null,
+          timeToFertilize:null,
+          timeToWater:null,
+          seed: seedEmptyId,
+        }
 
       );
+
+      // TODO add to warehouse
+
+  
+      return NextResponse.json({message: 'Field fertilized'});
+    }else if(fieldUpdateType === 'dig'){
+  
+
+      const response = await Field.findOneAndUpdate(
+        { _id: fieldId },
+        {
+          status: 'waitForPlant',
+        }
+
+      );
+
+      // TODO add to warehouse
+
   
       return NextResponse.json({message: 'Field fertilized'});
     }

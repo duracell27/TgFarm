@@ -10,7 +10,7 @@ const FieldSchema = new mongoose.Schema(
     timeToWater: {type: Date,  default: null},
     timeToFertilize: {type: Date,  default: null},
     timeToHarvest: {type: Date,  default: null},
-    status: {type: String, enum: ['waitForPlant','waitForWater', 'waitForFertilize','waitForHervest', 'waitForDig'], default: 'waitForPlant'}
+    status: {type: String, enum: ['waitForPlant','waitForWater', 'waitForFertilize','waitForHarvest', 'waitForDig'], default: 'waitForPlant'}
   },
   {
     timestamps: true,

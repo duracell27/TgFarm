@@ -26,6 +26,14 @@ const Fields = (props: Props) => {
     updateField(fieldId, seedId, fieldUpdateType, soilId)
   }
 
+  const handleHarvestField = (fieldId: ObjectId, seedId: ObjectId, fieldUpdateType:'harvest', soilId:ObjectId) =>{
+    updateField(fieldId, seedId, fieldUpdateType, soilId)
+  }
+
+  const handleDigField = (fieldId: ObjectId, seedId: ObjectId, fieldUpdateType:'dig', soilId:ObjectId) =>{
+    updateField(fieldId, seedId, fieldUpdateType, soilId)
+  }
+
   useEffect(() => {
     if (userData?.userId) {
       getFields(userData.userId);
@@ -87,6 +95,12 @@ const Fields = (props: Props) => {
 
               {/* фертулізувати */}
               {field.status === 'waitForFertilize' && (<button onClick={()=>handleFertilizeField(field._id, userData.defaultSeed._id, 'fertilize', userData.defaultSoil._id)} className="flex items-center gap-1"><Image src={'/images/icons/soil.png'} width={16} height={16} alt="soil"/>Удобрити {userData.defaultSoil.name}</button>)}
+
+              {/* зібрати урожай */}
+              {field.status === 'waitForHarvest' && (<button onClick={()=>handleHarvestField(field._id, userData.defaultSeed._id, 'harvest', userData.defaultSoil._id)} className="flex items-center gap-1"><Image src={'/images/icons/harvest.png'} width={16} height={16} alt="harvest"/>Зібрати урожай</button>)}
+
+              {/* зібрати урожай */}
+              {field.status === 'waitForDig' && (<button onClick={()=>handleDigField(field._id, userData.defaultSeed._id, 'dig', userData.defaultSoil._id)} className="flex items-center gap-1"><Image src={'/images/icons/dig.png'} width={16} height={16} alt="dig"/>Скопати</button>)}
           </div>
         </div>
       ))}
