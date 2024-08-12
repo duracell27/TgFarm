@@ -22,6 +22,7 @@ interface UserState {
   setDefaultSeed: (defaultSeedId: ObjectId) => void;
   setDefaultSoil: (defaultSoilId: ObjectId) => void;
   reNewUser: () => void;
+  updateUserStats: (expAmount: number, goldAmount: number, usdAmount: number, type: string) => Promise<boolean | undefined>;
 }
 
 interface Seed {
@@ -41,7 +42,7 @@ interface Soil {
   _id: ObjectId;
   name: string;
   price: number;
-  priceType: string;
+  priceType: 'gold' | 'usd' ;
   reduceTime: number;
   exp: number;
   imageUrl: string;
@@ -53,6 +54,18 @@ interface DefaultState {
   soils: Soil[] | null;
   getSeeds: () => void;
   getSoils: () => void;
+}
+
+
+interface FieldPrice {
+  _id: ObjectId;
+  ordinal: number;
+  costUsd: number;
+}
+
+interface PricesState {
+  fieldPrices: FieldPrice[] | null;
+  getFieldPrices: () => void;
 }
 
 interface Field {
@@ -80,6 +93,12 @@ interface FieldState {
     fieldUpdateType: "plant" | "water" | "fertilize" | "harvest" | "dig",
     soilId: ObjectId
   ) => void;
+}
+
+interface LvlState {
+  expToNextLvl: number | null;
+  percent: number | null;
+  getExpData: (userId: number) => void;
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
@@ -130,6 +149,28 @@ export const useUserStore = create<UserState>((set, get) => ({
       }
     }
   },
+  updateUserStats: async (expAmount, goldAmount, usdAmount, type) => {
+    const { userData, reNewUser } = get();
+    if (userData && userData.userId) {
+      const response = await axios.put("/api/userStats", {
+        expAmount,
+        goldAmount,
+        usdAmount,
+        type,
+        userId: userData.userId,
+      });
+      if (response.status === 200) {
+        if (response.data.result === true){
+          reNewUser();
+          return true
+        } else if (response.data.result === false){
+          return false
+        }
+      }
+    }
+    
+  }
+
 }));
 
 export const useDefaultStore = create<DefaultState>((set) => ({
@@ -162,6 +203,7 @@ export const useFieldtStore = create<FieldState>((set, get) => ({
   updateField: async (fieldId, seedId, fieldUpdateType, soilId) => {
     const { getFields } = get();
     const { userData } = useUserStore.getState();
+    const {getExpData} = useLvlStore.getState();
 
     const response = await axios.put("/api/fields", {
       fieldId,
@@ -172,7 +214,39 @@ export const useFieldtStore = create<FieldState>((set, get) => ({
     if (response.status === 200) {
       if (userData) {
         getFields(userData.userId);
+        getExpData(userData.userId)
       }
     }
   },
+}));
+
+export const usePricesStore = create<PricesState>((set) => ({
+  fieldPrices: null,
+  getFieldPrices: async () => {
+    const response = await axios.get("/api/fieldPrice");
+    if (response.status === 200) {
+      set({ fieldPrices: response.data });
+    }
+  },
+  
+}));
+
+export const useLvlStore = create<LvlState>((set) => ({
+  expToNextLvl: null,
+  percent: null,
+  getExpData: async (userId) => {
+    const { userData } = useUserStore.getState();
+    console.log('FROM LVL', userData)
+    
+
+      const response = await axios.get("/api/lvl", {
+        params: { userId},
+      });
+      if (response.status === 200) {
+        set({ expToNextLvl: response.data.needExp });
+        set({ percent: response.data.percent });
+      }
+    
+  },
+  
 }));

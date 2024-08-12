@@ -1,26 +1,30 @@
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import ProgressBar from "./ProgressBar";
 
 type HederProps = {
   name: string | undefined;
   gold: number | undefined;
   usd: number | undefined;
   lvl: number | undefined;
+  percent: number | null;
 };
 
-export const Header: React.FC<HederProps> = ({ name, gold, usd, lvl }) => {
+export const Header: React.FC<HederProps> = ({ name, gold, usd, lvl, percent }) => {
   if (
     name === undefined ||
     gold === undefined ||
     usd === undefined ||
-    lvl === undefined
+    lvl === undefined ||
+    percent === null
   ) {
     return null;
   }
   return (
     <Link href={"/"} className="">
       <div className="text-yellow-500 text-[8px]">beta ver. 0.002</div>
+      <ProgressBar progress={percent} />
       <div className="flex justify-between items-center text-yellow-500 p-2 pb-0">
         <div className="flex-shrink overflow-hidden max-w-full">
           <p className="truncate font-bold">@{name}</p>

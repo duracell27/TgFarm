@@ -5,14 +5,13 @@ import { useDefaultStore, useUserStore } from "@/store/store";
 import { ObjectId } from "bson";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
+import React from "react";
 
 type Props = {};
 
 const ChooseDefaultSeed = (props: Props) => {
   const userData = useUserStore((state) => state.userData);
   const seeds = useDefaultStore((state) => state.seeds);
-  const getSeeds = useDefaultStore((state) => state.getSeeds);
   const setDefaultSeed = useUserStore((state) => state.setDefaultSeed);
 
   const router = useRouter();
@@ -21,10 +20,6 @@ const ChooseDefaultSeed = (props: Props) => {
    setDefaultSeed(id);
    router.push('/');
   };
-
-  useEffect(() => {
-    getSeeds();
-  }, []);
 
   if (!seeds || !userData) {
     return null;

@@ -4,7 +4,7 @@ import { useDefaultStore, useUserStore } from "@/store/store";
 import { ObjectId } from "bson";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
+import React from "react";
 
 type Props = {};
 
@@ -12,7 +12,6 @@ const ChooseDefaultSoil = (props: Props) => {
   const userData = useUserStore((state) => state.userData);
   const setDefaultSoil = useUserStore(state=>state.setDefaultSoil)
   const soils = useDefaultStore((state) => state.soils);
-  const getSoils = useDefaultStore((state) => state.getSoils);
 
   const router = useRouter();
 
@@ -20,10 +19,6 @@ const ChooseDefaultSoil = (props: Props) => {
     setDefaultSoil(id);
    router.push('/');
   };
-
-  useEffect(() => {
-    getSoils();
-  }, []);
 
   if (!soils || !userData) {
     return null;

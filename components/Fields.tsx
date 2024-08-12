@@ -1,38 +1,106 @@
 "use client";
-import { useFieldtStore, useUserStore } from "@/store/store";
+import { useFieldtStore, usePricesStore, useUserStore } from "@/store/store";
 import Image from "next/image";
 import { ObjectId } from "bson";
 import Link from "next/link";
 import React, { useEffect } from "react";
-import { formatTime, remainingTime } from "@/libs/workWithTime";
+import { formatTime, isTimePositive, remainingTime } from "@/libs/workWithTime";
+import toast from "react-hot-toast";
 
 type Props = {};
 
 const Fields = (props: Props) => {
   const userData = useUserStore((store) => store.userData);
   const fields = useFieldtStore((state) => state.fields);
+  const fieldPrices = usePricesStore((store) => store.fieldPrices);
   const getFields = useFieldtStore((state) => state.getFields);
-  const updateField = useFieldtStore(state=>state.updateField)
+  const updateField = useFieldtStore((state) => state.updateField);
+  const updateUserStats = useUserStore(state => state.updateUserStats)
 
-  const handlePlantField = (fieldId: ObjectId, seedId: ObjectId, fieldUpdateType:'plant', soilId:ObjectId) =>{
-    updateField(fieldId, seedId, fieldUpdateType, soilId)
-  }
+  const handlePlantField = async(
+    fieldId: ObjectId,
+    seedId: ObjectId,
+    fieldUpdateType: "plant",
+    soilId: ObjectId,
+    baseCost: number,
+    baseExp: number
+  ) => {
+    const gold = baseCost
+    const exp = baseExp
+    const moneyCheck = await updateUserStats(exp,gold,0,'gold-')
+    if (!moneyCheck) {
+      toast.error('')
+    }else if (moneyCheck){
+      updateField(fieldId, seedId, fieldUpdateType, soilId);
+    }
+  };
 
-  const handleWaterField = (fieldId: ObjectId, seedId: ObjectId, fieldUpdateType:'water', soilId:ObjectId) =>{
-    updateField(fieldId, seedId, fieldUpdateType, soilId)
-  }
+  const handleWaterField = async(
+    fieldId: ObjectId,
+    seedId: ObjectId,
+    fieldUpdateType: "water",
+    soilId: ObjectId
+  ) => {
+    const baseExp = 5
+    const exp = baseExp
+    const moneyCheck = await updateUserStats(exp,0,0,'exp+')
+    if (!moneyCheck) {
+      toast.error('')
+    }else if (moneyCheck){
+      updateField(fieldId, seedId, fieldUpdateType, soilId);
+    }
+  };
 
-  const handleFertilizeField = (fieldId: ObjectId, seedId: ObjectId, fieldUpdateType:'fertilize', soilId:ObjectId) =>{
-    updateField(fieldId, seedId, fieldUpdateType, soilId)
-  }
+  const handleFertilizeField = async (
+    fieldId: ObjectId,
+    seedId: ObjectId,
+    fieldUpdateType: "fertilize",
+    soilId: ObjectId,
+    baseCost: number,
+    baseExp: number,
+    moneyType: 'gold' | 'usd'
+  ) => {
+    const gold = baseCost
+    const exp = baseExp
+    let moneyCheck
+    if(moneyType === 'gold'){
+      moneyCheck = await updateUserStats(exp,gold,0,'gold-')
+    }else if(moneyType === 'usd'){
+      moneyCheck = await updateUserStats(exp,0,baseCost,'usd-')
+    }
+    if (!moneyCheck) {
+      toast.error('')
+    }else if (moneyCheck){
+      updateField(fieldId, seedId, fieldUpdateType, soilId);
+    }
+  };
 
-  const handleHarvestField = (fieldId: ObjectId, seedId: ObjectId, fieldUpdateType:'harvest', soilId:ObjectId) =>{
-    updateField(fieldId, seedId, fieldUpdateType, soilId)
-  }
+  const handleHarvestField = (
+    fieldId: ObjectId,
+    seedId: ObjectId,
+    fieldUpdateType: "harvest",
+    soilId: ObjectId
+  ) => {
+    updateField(fieldId, seedId, fieldUpdateType, soilId);
+  };
 
-  const handleDigField = (fieldId: ObjectId, seedId: ObjectId, fieldUpdateType:'dig', soilId:ObjectId) =>{
-    updateField(fieldId, seedId, fieldUpdateType, soilId)
-  }
+  const handleDigField = async(
+    fieldId: ObjectId,
+    seedId: ObjectId,
+    fieldUpdateType: "dig",
+    soilId: ObjectId,
+    userLvl: number
+  ) => {
+   
+    const baseExp = 1
+    const exp = baseExp * userLvl
+    const moneyCheck = await updateUserStats(exp,0,0,'exp+')
+    if (!moneyCheck) {
+      toast.error('')
+    }else if (moneyCheck){
+      updateField(fieldId, seedId, fieldUpdateType, soilId);
+    }
+  };
 
   useEffect(() => {
     if (userData?.userId) {
@@ -40,14 +108,15 @@ const Fields = (props: Props) => {
     }
   }, [userData?.userId]);
 
-  if (!fields || !userData) {
+  if (!fields || !userData || !fieldPrices) {
     return null;
   }
+
   return (
     <div className="text-yellow-500">
       {fields.map((field, index) => (
-        <div key={index} className="flex  my-2">
-          <div className="min-w-14 pl-1">
+        <div key={index} className="flex my-2">
+          <div className="min-w-14">
             {/* встановлення картинки відностно статусу початок */}
             {field.status === "waitForPlant" && (
               <Image
@@ -83,27 +152,215 @@ const Fields = (props: Props) => {
             {field.status === "waitForDig" && <p>Не оброблена земля</p>}
             {(field.status === "waitForWater" ||
               field.status === "waitForFertilize" ||
-              field.status === "waitForHarvest") && <p>{field.seed?.name} <span className="text-sm text-yellow-500/45">(Урожай через {field.timeToHarvest && remainingTime(field.timeToHarvest)})</span></p>}
+              field.status === "waitForHarvest") && (
+              <p>
+                {field.seed?.name}{" "}
+                <span className="text-sm text-yellow-500/45">
+                  (Урожай через{" "}
+                  {field.timeToHarvest && remainingTime(field.timeToHarvest)})
+                </span>
+              </p>
+            )}
             {/* встановлення опису заголовку відностно статусу кінець */}
 
-              {/* посадити */}
-              {field.status === 'waitForPlant' && userData.defaultSeed.name === "Пусто" && (<Link className="flex items-center gap-1" href={'/chooseDefaultSeed'}><Image src={'/images/icons/seed.png'} width={16} height={16} alt="seed"/>Посадити</Link>)}
-              {field.status === 'waitForPlant' && userData.defaultSeed.name !== "Пусто" && (<button onClick={()=>handlePlantField(field._id, userData.defaultSeed._id, 'plant', userData.defaultSoil._id)} className="flex items-center gap-1"><Image src={'/images/icons/seed.png'} width={16} height={16} alt="seed"/> Посадити {userData?.defaultSeed?.name}</button>)}
+            {/* посадити */}
+            {field.status === "waitForPlant" &&
+              userData.defaultSeed.name === "Пусто" && (
+                <Link
+                  className="flex items-center gap-1"
+                  href={"/chooseDefaultSeed"}
+                >
+                  <Image
+                    src={"/images/icons/seed.png"}
+                    width={16}
+                    height={16}
+                    alt="seed"
+                  />
+                  Посадити
+                </Link>
+              )}
+            {field.status === "waitForPlant" &&
+              userData.defaultSeed.name !== "Пусто" && (
+                <button
+                  onClick={() =>
+                    handlePlantField(
+                      field._id,
+                      userData.defaultSeed._id,
+                      "plant",
+                      userData.defaultSoil._id,
+                      userData.defaultSeed.price,
+                      userData.defaultSeed.exp
+                    )
+                  }
+                  className="flex items-center gap-1"
+                >
+                  <Image
+                    src={"/images/icons/seed.png"}
+                    width={16}
+                    height={16}
+                    alt="seed"
+                  />{" "}
+                  Посадити {userData?.defaultSeed?.name}
+                </button>
+              )}
 
-              {/* полити  */}
-              {field.status === 'waitForWater' && (<button onClick={()=>handleWaterField(field._id, userData.defaultSeed._id, 'water', userData.defaultSoil._id)} className="flex items-center gap-1"><Image src={'/images/icons/water.png'} width={16} height={16} alt="soil"/> Полити</button>)}
+            {/* полити  */}
+            {/* {field.status === 'waitForWater' && !isTimePositive(remainingTime(field.timeToWater)) && } */}
+            {field.status === "waitForWater" ? (
+              isTimePositive(remainingTime(field.timeToWater)) ? (
+                <p className="text-sm text-yellow-500/45">
+                  Час до поливу {remainingTime(field.timeToWater)}
+                </p>
+              ) : (
+                <button
+                  onClick={() =>
+                    handleWaterField(
+                      field._id,
+                      userData.defaultSeed._id,
+                      "water",
+                      userData.defaultSoil._id
+                    )
+                  }
+                  className="flex items-center gap-1"
+                >
+                  <Image
+                    src={"/images/icons/water.png"}
+                    width={16}
+                    height={16}
+                    alt="soil"
+                  />{" "}
+                  Полити
+                </button>
+              )
+            ) : (
+              ""
+            )}
 
-              {/* фертулізувати */}
-              {field.status === 'waitForFertilize' && (<button onClick={()=>handleFertilizeField(field._id, userData.defaultSeed._id, 'fertilize', userData.defaultSoil._id)} className="flex items-center gap-1"><Image src={'/images/icons/soil.png'} width={16} height={16} alt="soil"/>Удобрити {userData.defaultSoil.name}</button>)}
+            {/* фертулізувати */}
+            {field.status === "waitForFertilize" ? (
+              isTimePositive(remainingTime(field.timeToFertilize)) ? (
+                <p className="text-sm text-yellow-500/45">
+                  Час до добрива {remainingTime(field.timeToFertilize)}
+                </p>
+              ) : (
+                <button
+                  onClick={() =>
+                    handleFertilizeField(
+                      field._id,
+                      userData.defaultSeed._id,
+                      "fertilize",
+                      userData.defaultSoil._id,
+                      userData.defaultSoil.price,
+                      userData.defaultSoil.exp,
+                      userData.defaultSoil.priceType
+                    )
+                  }
+                  className="flex items-center gap-1"
+                >
+                  <Image
+                    src={"/images/icons/soil.png"}
+                    width={16}
+                    height={16}
+                    alt="soil"
+                  />
+                  Удобрити {userData.defaultSoil.name}
+                </button>
+              )
+            ) : (
+              ""
+            )}
 
-              {/* зібрати урожай */}
-              {field.status === 'waitForHarvest' && (<button onClick={()=>handleHarvestField(field._id, userData.defaultSeed._id, 'harvest', userData.defaultSoil._id)} className="flex items-center gap-1"><Image src={'/images/icons/harvest.png'} width={16} height={16} alt="harvest"/>Зібрати урожай</button>)}
+            {/* зібрати урожай */}
+            {field.status === "waitForHarvest" ? (
+              isTimePositive(remainingTime(field.timeToHarvest)) ? (
+                ""
+              ) : (
+                <button
+                  onClick={() =>
+                    handleHarvestField(
+                      field._id,
+                      userData.defaultSeed._id,
+                      "harvest",
+                      userData.defaultSoil._id
+                    )
+                  }
+                  className="flex items-center gap-1"
+                >
+                  <Image
+                    src={"/images/icons/harvest.png"}
+                    width={16}
+                    height={16}
+                    alt="harvest"
+                  />
+                  Зібрати урожай
+                </button>
+              )
+            ) : (
+              ""
+            )}
 
-              {/* зібрати урожай */}
-              {field.status === 'waitForDig' && (<button onClick={()=>handleDigField(field._id, userData.defaultSeed._id, 'dig', userData.defaultSoil._id)} className="flex items-center gap-1"><Image src={'/images/icons/dig.png'} width={16} height={16} alt="dig"/>Скопати</button>)}
+            {/* зібрати урожай */}
+            {field.status === "waitForDig" && (
+              <button
+                onClick={() =>
+                  handleDigField(
+                    field._id,
+                    userData.defaultSeed._id,
+                    "dig",
+                    userData.defaultSoil._id,
+                    userData.lvl
+                  )
+                }
+                className="flex items-center gap-1"
+              >
+                <Image
+                  src={"/images/icons/dig.png"}
+                  width={16}
+                  height={16}
+                  alt="dig"
+                />
+                Скопати
+              </button>
+            )}
           </div>
         </div>
       ))}
+
+      {/* заголовок */}
+      <div className="flex  my-2">
+        <div className="min-w-14 pl-1">
+          <Image
+            src={`/images/fields/ground.jpg`}
+            width={48}
+            height={48}
+            alt="ground"
+          />
+        </div>
+        <div className="">
+          <p>Нова земля</p>
+          <p className="">
+            <button className="flex items-center gap-1">
+              <Image
+                src={`/images/icons/cart.png`}
+                width={16}
+                height={16}
+                alt="cart"
+              />{" "}
+              Купити за{" "}
+              {
+                fieldPrices.find((item) => item.ordinal === fields.length + 1)
+                  ?.costUsd
+              }{" "}
+              <Image
+                src={`/images/icons/usd.png`}
+                width={16}
+                height={16}
+                alt="cart"
+              />
+            </button>
+          </p>
+        </div>
+      </div>
     </div>
   );
 };

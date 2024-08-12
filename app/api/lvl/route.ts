@@ -1,6 +1,7 @@
 import connectDB from "@/libs/connectDb";
 import Lvl from "@/models/Lvl";
-import { NextResponse } from "next/server";
+import User from "@/models/User";
+import { NextRequest, NextResponse } from "next/server";
 
 const lvls = [
     { lvl: 2, needExp: 30 },
@@ -49,3 +50,24 @@ const lvls = [
 //         return NextResponse.json({ error: "Failed to add seed" }, { status: 500 });
 //     }
 // }
+
+export const GET = async (req: NextRequest) => {
+    const { searchParams } = new URL(req.url);
+  const userId = searchParams.get("userId");
+    console.log(userId);
+   
+    try {
+        await connectDB()
+
+        const user = await User.findOne({ userId })
+        const lvlObj = await Lvl.findOne({lvl: user.lvl+1})
+        const needExp = lvlObj.needExp
+        const percent = Math.round((user.exp / needExp) * 100);
+
+        return NextResponse.json({needExp, percent}, { status: 200 });
+        
+    } catch (error) {
+        console.log(error);
+        return NextResponse.json({ error: "Failed to get lvl data" }, { status: 500 });
+    }
+}

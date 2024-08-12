@@ -67,3 +67,18 @@ const fields = [
 //         return NextResponse.json({ error: "Failed to add seed" }, { status: 500 });
 //     }
 // }
+
+export const GET = async () => {
+    
+    try {
+        await connectDB()
+
+        const response = await FieldPrice.find().sort({ ordinal: 1})
+
+        return NextResponse.json(response, { status: 200 });
+        
+    } catch (error) {
+        console.log(error);
+        return NextResponse.json({ error: "Error when load field prices" }, { status: 500 });
+    }
+}

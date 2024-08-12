@@ -27,7 +27,10 @@ export function formatTime(seconds: number): string {
   }
 }
 
-export function remainingTime(date: Date): string {
+export function remainingTime(date: Date | null): string {
+  if (!date) {
+    return '';
+  }
   const convertedDate = new Date(date)
   if(convertedDate){
     
@@ -39,3 +42,13 @@ export function remainingTime(date: Date): string {
   }
   return '';
 }
+
+export function isTimePositive(timeString: string): boolean {
+  
+  // Витягуємо всі числа зі строки (позитивні та негативні)
+  const numbers = timeString.match(/-?\d+/g)?.map(Number) || [];
+
+  // Перевіряємо, чи всі числа є не меншими за 0
+  return numbers.every(num => num >= 0);
+}
+

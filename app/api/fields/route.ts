@@ -35,7 +35,7 @@ export const GET = async (req: NextRequest) => {
 };
 
 export const PUT = async (req: NextRequest) => {
-  console.log('from api')
+
   const data: UpdateFieldType = await req.json();
   const { fieldId, seedId, fieldUpdateType, soilId } = data;
   try {
@@ -78,7 +78,7 @@ export const PUT = async (req: NextRequest) => {
         return NextResponse.json({ error: 'Field not found' }, { status: 404 });
       }
 
-      // Reduce the timeToHarvest by 10 minutes
+      
       const reducedTimeToHarvest = new Date(field.timeToHarvest.getTime() - 10 * 60 * 1000); // Subtract 10 minutes
 
 
@@ -106,7 +106,7 @@ export const PUT = async (req: NextRequest) => {
         return NextResponse.json({ error: 'Field not found' }, { status: 404 });
       }
 
-      // Reduce the timeToHarvest by 10 minutes
+
       const reducedTimeToHarvest = new Date(field.timeToHarvest.getTime() - soil.reduceTime * 1000); // Subtract 10 minutes
 
 

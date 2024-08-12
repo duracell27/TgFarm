@@ -4,9 +4,10 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
 import { Header } from "@/components/Header";
-import { useUserStore } from "@/store/store";
+import { useLvlStore, useUserStore } from "@/store/store";
 import WebApp from "@twa-dev/sdk";
 import { useEffect } from "react";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,6 +23,7 @@ export default function RootLayout({
 }>) {
   const userData = useUserStore((state) => state.userData);
   const getUserData = useUserStore((state) => state.getUserData);
+  const percent = useLvlStore(state=> state.percent)
 
   useEffect(() => {
     if (WebApp.initDataUnsafe.user) {
@@ -49,11 +51,13 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className + " bg-black"}>
+        <Toaster />
         <Header
           name={userData?.userName || userData?.firstName}
           gold={userData?.gold}
           usd={userData?.usd}
           lvl={userData?.lvl}
+          percent={percent}
         />
         {children}
       </body>
