@@ -17,17 +17,6 @@ export default function Home() {
   const getSoils = useDefaultStore((state) => state.getSoils);
   const getExpData = useLvlStore((state) => state.getExpData);
 
-  // const updateUserStats = useUserStore(state => state.updateUserStats)
-
-  // const handler = async() => {
-  //  const kek = await updateUserStats(2,630,0,'gold+')
-  //  if (kek) {
-  //    console.log('update')
-  //  }else{
-  //   console.log('no update')
-  //  }
-  // }
-
   useEffect(() => {
     getFieldPrices();
     getSeeds();
@@ -43,7 +32,7 @@ export default function Home() {
     <main className="p-2">
       <Fields />
       <DefaultSeedAndSoil />
-      <button className="text-yellow-500">test</button>
+      <hr className="bg-yellow-500 h-[2px]" />
     </main>
   );
 }

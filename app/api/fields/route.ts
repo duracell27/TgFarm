@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Seed from "@/models/Seed";
 import Soil from "@/models/Soil";
 import { seedEmptyId } from "@/libs/constants";
+import { remainingTime } from "@/libs/workWithTime";
 
 interface UpdateFieldType {
   fieldId: ObjectId;
@@ -23,6 +24,19 @@ export const GET = async (req: NextRequest) => {
     const fields = await Field.find({ userId })
       .populate("seed")
       .sort({ ordinalNumber: "asc" });
+
+      const now = new Date();
+
+    const updatedFields = await Promise.all(
+      fields.map(async (field) => {
+        if( field.timeToHarvest !== null && (now > new Date(field.timeToHarvest))) {
+          field.status = "waitForHarvest";
+
+          await field.save(); // Save the updated field
+        }
+        return field;
+      })
+    );
 
     return NextResponse.json(fields, { status: 200 });
   } catch (error) {
@@ -78,6 +92,7 @@ export const PUT = async (req: NextRequest) => {
         return NextResponse.json({ error: 'Field not found' }, { status: 404 });
       }
 
+      
       
       const reducedTimeToHarvest = new Date(field.timeToHarvest.getTime() - 10 * 60 * 1000); // Subtract 10 minutes
 

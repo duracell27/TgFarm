@@ -156,8 +156,8 @@ const Fields = (props: Props) => {
               <p>
                 {field.seed?.name}{" "}
                 <span className="text-sm text-yellow-500/45">
-                  (Урожай через{" "}
-                  {field.timeToHarvest && remainingTime(field.timeToHarvest)})
+                  
+                  {field.timeToHarvest && isTimePositive(remainingTime(field.timeToHarvest)) && (<>Урожай через {" "} {remainingTime(field.timeToHarvest)}</>)}
                 </span>
               </p>
             )}
@@ -328,7 +328,7 @@ const Fields = (props: Props) => {
 
       {/* заголовок */}
       <div className="flex  my-2">
-        <div className="min-w-14 pl-1">
+        <div className="min-w-14">
           <Image
             src={`/images/fields/ground.jpg`}
             width={48}

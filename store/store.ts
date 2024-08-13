@@ -236,8 +236,6 @@ export const useLvlStore = create<LvlState>((set) => ({
   percent: null,
   getExpData: async (userId) => {
     const { userData } = useUserStore.getState();
-    console.log('FROM LVL', userData)
-    
 
       const response = await axios.get("/api/lvl", {
         params: { userId},
@@ -245,6 +243,10 @@ export const useLvlStore = create<LvlState>((set) => ({
       if (response.status === 200) {
         set({ expToNextLvl: response.data.needExp });
         set({ percent: response.data.percent });
+
+        if(response.data.needToUpdateUserData){
+          useUserStore.getState().reNewUser()
+        }
       }
     
   },

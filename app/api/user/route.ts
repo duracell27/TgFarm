@@ -38,11 +38,11 @@ export const POST = async (req: NextRequest) => {
       //беремо дані користувача і новляємо останній вхід
       user.lastLogin = new Date();
       await user.save();
-      console.log("from exist");
+      
       return NextResponse.json(user);
     } else {
       //реєсрація користувача
-      console.log("from create");
+     
       const newUser = await User.create({
         userId,
         firstName: data.first_name,
