@@ -175,3 +175,28 @@ export const PUT = async (req: NextRequest) => {
     console.log("from user api post", error);
   }
 };
+
+export const POST = async (req: NextRequest) => {
+
+  const data= await req.json();
+  const { userId, ordinal} = data;
+
+  try {
+    await connectDB();
+    await Field.create({
+      userId: userId,
+      ordinalNumber: ordinal,
+      status: 'waitForPlant',
+      seed: seedEmptyId,
+    })
+   
+    return NextResponse.json({message: 'Bought field'}, { status: 200 });
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json(
+      { error: "Failed to fetch user Fields" },
+      { status: 500 }
+    );
+  }
+
+}

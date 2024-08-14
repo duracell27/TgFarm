@@ -8,6 +8,7 @@ import { useLvlStore, useUserStore } from "@/store/store";
 import WebApp from "@twa-dev/sdk";
 import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
+import Menu from "@/components/Menu";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -60,6 +61,7 @@ export default function RootLayout({
           percent={percent}
         />
         {children}
+        <Menu/>
       </body>
     </html>
   );

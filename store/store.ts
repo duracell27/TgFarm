@@ -22,7 +22,28 @@ interface UserState {
   setDefaultSeed: (defaultSeedId: ObjectId) => void;
   setDefaultSoil: (defaultSoilId: ObjectId) => void;
   reNewUser: () => void;
-  updateUserStats: (expAmount: number, goldAmount: number, usdAmount: number, type: string) => Promise<boolean | undefined>;
+  updateUserStats: (
+    expAmount: number,
+    goldAmount: number,
+    usdAmount: number,
+    type: string
+  ) => Promise<boolean | undefined>;
+}
+interface User{
+  _id: ObjectId;
+  userId: number;
+    firstName: string;
+    lastName: string;
+    userName: string;
+    languageCode: string;
+    isPremium: boolean;
+    gold: number;
+    usd: number;
+    lvl: number;
+    exp: number;
+    lastLogin: Date;
+    defaultSeed: Seed;
+    defaultSoil: Soil;
 }
 
 interface Seed {
@@ -42,7 +63,7 @@ interface Soil {
   _id: ObjectId;
   name: string;
   price: number;
-  priceType: 'gold' | 'usd' ;
+  priceType: "gold" | "usd";
   reduceTime: number;
   exp: number;
   imageUrl: string;
@@ -55,7 +76,6 @@ interface DefaultState {
   getSeeds: () => void;
   getSoils: () => void;
 }
-
 
 interface FieldPrice {
   _id: ObjectId;
@@ -93,12 +113,18 @@ interface FieldState {
     fieldUpdateType: "plant" | "water" | "fertilize" | "harvest" | "dig",
     soilId: ObjectId
   ) => void;
+  buyField: (userId: number, ordinal: number) => void;
 }
 
 interface LvlState {
   expToNextLvl: number | null;
   percent: number | null;
   getExpData: (userId: number) => void;
+}
+
+interface RatingState {
+  ratingList: User[] | null,
+  getRatingList: () => void;
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
@@ -160,17 +186,15 @@ export const useUserStore = create<UserState>((set, get) => ({
         userId: userData.userId,
       });
       if (response.status === 200) {
-        if (response.data.result === true){
+        if (response.data.result === true) {
           reNewUser();
-          return true
-        } else if (response.data.result === false){
-          return false
+          return true;
+        } else if (response.data.result === false) {
+          return false;
         }
       }
     }
-    
-  }
-
+  },
 }));
 
 export const useDefaultStore = create<DefaultState>((set) => ({
@@ -203,7 +227,7 @@ export const useFieldtStore = create<FieldState>((set, get) => ({
   updateField: async (fieldId, seedId, fieldUpdateType, soilId) => {
     const { getFields } = get();
     const { userData } = useUserStore.getState();
-    const {getExpData} = useLvlStore.getState();
+    const { getExpData } = useLvlStore.getState();
 
     const response = await axios.put("/api/fields", {
       fieldId,
@@ -214,8 +238,15 @@ export const useFieldtStore = create<FieldState>((set, get) => ({
     if (response.status === 200) {
       if (userData) {
         getFields(userData.userId);
-        getExpData(userData.userId)
+        getExpData(userData.userId);
       }
+    }
+  },
+  buyField: async (userId, ordinal) => {
+    const response = await axios.post("/api/fields", { userId, ordinal });
+    if (response.status === 200) {
+      const { getFields } = get();
+      getFields(userId);
     }
   },
 }));
@@ -228,7 +259,6 @@ export const usePricesStore = create<PricesState>((set) => ({
       set({ fieldPrices: response.data });
     }
   },
-  
 }));
 
 export const useLvlStore = create<LvlState>((set) => ({
@@ -237,18 +267,26 @@ export const useLvlStore = create<LvlState>((set) => ({
   getExpData: async (userId) => {
     const { userData } = useUserStore.getState();
 
-      const response = await axios.get("/api/lvl", {
-        params: { userId},
-      });
-      if (response.status === 200) {
-        set({ expToNextLvl: response.data.needExp });
-        set({ percent: response.data.percent });
+    const response = await axios.get("/api/lvl", {
+      params: { userId },
+    });
+    if (response.status === 200) {
+      set({ expToNextLvl: response.data.needExp });
+      set({ percent: response.data.percent });
 
-        if(response.data.needToUpdateUserData){
-          useUserStore.getState().reNewUser()
-        }
+      if (response.data.needToUpdateUserData) {
+        useUserStore.getState().reNewUser();
       }
-    
+    }
   },
-  
+}));
+
+export const useRatingStore = create<RatingState>((set) => ({
+  ratingList: null,
+  getRatingList: async () => {
+    const response = await axios.get("/api/rating");
+    if (response.status === 200) {
+      set({ ratingList: response.data });
+    }
+  },
 }));

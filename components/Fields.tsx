@@ -15,9 +15,10 @@ const Fields = (props: Props) => {
   const fieldPrices = usePricesStore((store) => store.fieldPrices);
   const getFields = useFieldtStore((state) => state.getFields);
   const updateField = useFieldtStore((state) => state.updateField);
-  const updateUserStats = useUserStore(state => state.updateUserStats)
+  const updateUserStats = useUserStore((state) => state.updateUserStats);
+  const buyField = useFieldtStore((state) => state.buyField);
 
-  const handlePlantField = async(
+  const handlePlantField = async (
     fieldId: ObjectId,
     seedId: ObjectId,
     fieldUpdateType: "plant",
@@ -25,28 +26,28 @@ const Fields = (props: Props) => {
     baseCost: number,
     baseExp: number
   ) => {
-    const gold = baseCost
-    const exp = baseExp
-    const moneyCheck = await updateUserStats(exp,gold,0,'gold-')
+    const gold = baseCost;
+    const exp = baseExp;
+    const moneyCheck = await updateUserStats(exp, gold, 0, "gold-");
     if (!moneyCheck) {
-      toast.error('')
-    }else if (moneyCheck){
+      toast.error("");
+    } else if (moneyCheck) {
       updateField(fieldId, seedId, fieldUpdateType, soilId);
     }
   };
 
-  const handleWaterField = async(
+  const handleWaterField = async (
     fieldId: ObjectId,
     seedId: ObjectId,
     fieldUpdateType: "water",
     soilId: ObjectId
   ) => {
-    const baseExp = 5
-    const exp = baseExp
-    const moneyCheck = await updateUserStats(exp,0,0,'exp+')
+    const baseExp = 5;
+    const exp = baseExp;
+    const moneyCheck = await updateUserStats(exp, 0, 0, "exp+");
     if (!moneyCheck) {
-      toast.error('')
-    }else if (moneyCheck){
+      toast.error("");
+    } else if (moneyCheck) {
       updateField(fieldId, seedId, fieldUpdateType, soilId);
     }
   };
@@ -58,19 +59,19 @@ const Fields = (props: Props) => {
     soilId: ObjectId,
     baseCost: number,
     baseExp: number,
-    moneyType: 'gold' | 'usd'
+    moneyType: "gold" | "usd"
   ) => {
-    const gold = baseCost
-    const exp = baseExp
-    let moneyCheck
-    if(moneyType === 'gold'){
-      moneyCheck = await updateUserStats(exp,gold,0,'gold-')
-    }else if(moneyType === 'usd'){
-      moneyCheck = await updateUserStats(exp,0,baseCost,'usd-')
+    const gold = baseCost;
+    const exp = baseExp;
+    let moneyCheck;
+    if (moneyType === "gold") {
+      moneyCheck = await updateUserStats(exp, gold, 0, "gold-");
+    } else if (moneyType === "usd") {
+      moneyCheck = await updateUserStats(exp, 0, baseCost, "usd-");
     }
     if (!moneyCheck) {
-      toast.error('')
-    }else if (moneyCheck){
+      toast.error("");
+    } else if (moneyCheck) {
       updateField(fieldId, seedId, fieldUpdateType, soilId);
     }
   };
@@ -84,21 +85,34 @@ const Fields = (props: Props) => {
     updateField(fieldId, seedId, fieldUpdateType, soilId);
   };
 
-  const handleDigField = async(
+  const handleDigField = async (
     fieldId: ObjectId,
     seedId: ObjectId,
     fieldUpdateType: "dig",
     soilId: ObjectId,
     userLvl: number
   ) => {
-   
-    const baseExp = 1
-    const exp = baseExp * userLvl
-    const moneyCheck = await updateUserStats(exp,0,0,'exp+')
+    const baseExp = 1;
+    const exp = baseExp * userLvl;
+    const moneyCheck = await updateUserStats(exp, 0, 0, "exp+");
     if (!moneyCheck) {
-      toast.error('')
-    }else if (moneyCheck){
+      toast.error("");
+    } else if (moneyCheck) {
       updateField(fieldId, seedId, fieldUpdateType, soilId);
+    }
+  };
+
+  const buyFieldHandler = async (
+    userId: number,
+    ordinal: number,
+    price: number | null
+  ) => {
+    if (price === null) return toast.error("Помилка при покупці");
+    const moneyCheck = await updateUserStats(0, 0, price, "usd-");
+    if (!moneyCheck) {
+      toast.error("Не достатньо коштів для покупки нового поля");
+    } else if (moneyCheck) {
+      buyField(userId, ordinal);
     }
   };
 
@@ -111,6 +125,7 @@ const Fields = (props: Props) => {
   if (!fields || !userData || !fieldPrices) {
     return null;
   }
+  const nextFieldPrice:number | null = fieldPrices.find((item) => item.ordinal === fields.length + 1)?.costUsd ?? null;
 
   return (
     <div className="text-yellow-500">
@@ -156,8 +171,10 @@ const Fields = (props: Props) => {
               <p>
                 {field.seed?.name}{" "}
                 <span className="text-sm text-yellow-500/45">
-                  
-                  {field.timeToHarvest && isTimePositive(remainingTime(field.timeToHarvest)) && (<>Урожай через {" "} {remainingTime(field.timeToHarvest)}</>)}
+                  {field.timeToHarvest &&
+                    isTimePositive(remainingTime(field.timeToHarvest)) && (
+                      <>Урожай через {remainingTime(field.timeToHarvest)}</>
+                    )}
                 </span>
               </p>
             )}
@@ -345,18 +362,26 @@ const Fields = (props: Props) => {
                 width={16}
                 height={16}
                 alt="cart"
-              />{" "}
-              Купити за{" "}
-              {
-                fieldPrices.find((item) => item.ordinal === fields.length + 1)
-                  ?.costUsd
-              }{" "}
-              <Image
-                src={`/images/icons/usd.png`}
-                width={16}
-                height={16}
-                alt="cart"
               />
+              <button
+              className="flex items-center gap-1"
+                onClick={() =>
+                  buyFieldHandler(
+                    userData.userId,
+                    fields.length + 1,
+                    nextFieldPrice
+                  )
+                }
+              >
+                Купити за{" "}
+                <Image
+                  src={`/images/icons/usd.png`}
+                  width={16}
+                  height={16}
+                  alt="cart"
+                />
+                {nextFieldPrice}{" "}
+              </button>
             </button>
           </p>
         </div>
