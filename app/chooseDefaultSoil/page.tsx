@@ -33,9 +33,10 @@ const ChooseDefaultSoil = (props: Props) => {
           return (
             <div
           key={index}
+          
           onClick={()=>handleSetDefaultSeed(soil._id)}
           className={
-            (userData.lvl < soil.lvl ? "bg-slate-700 " : "bg-slate-900 ") +
+            (userData.lvl < soil.lvl ? "bg-slate-700 pointer-events-none" : "bg-slate-900 ") +
             " flex gap-2 py-1 my-2 rounded-md cursor-pointer"
           }
         >

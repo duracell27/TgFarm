@@ -1,5 +1,5 @@
 "use client";
-import { useRatingStore, useUserStore } from "@/store/store";
+import { useLvlStore, useRatingStore, useUserStore } from "@/store/store";
 import Image from "next/image";
 import React, { useEffect } from "react";
 
@@ -9,6 +9,17 @@ const Rating = (props: Props) => {
   const userData = useUserStore((state) => state.userData);
   const getRatingList = useRatingStore((state) => state.getRatingList);
   const ratingList = useRatingStore((state) => state.ratingList);
+
+  const getExpData = useLvlStore((state) => state.getExpData);
+  const percent = useLvlStore((state) => state.percent);
+
+  useEffect(() => {
+    if (userData?.userId) {
+      if (percent === null) {
+        getExpData(userData.userId);
+      }
+    }
+  }, [userData?.userId]);
 
   useEffect(() => {
     getRatingList();

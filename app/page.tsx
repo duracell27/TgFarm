@@ -37,7 +37,6 @@ export default function Home() {
       <Fields />
       <DefaultSeedAndSoil />
       <hr className="border-yellow-500 border my-1" />
-      <Link href={'/werehouse'} className="text-yellow-500">склад</Link>
     </main>
   );
 }

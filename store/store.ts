@@ -92,7 +92,7 @@ interface Field {
   _id: ObjectId;
   userId: number;
   ordinalNumber: number;
-  seed: Seed | null;
+  seed: Seed;
   timeToWater: Date | null;
   timeToFertilize: Date | null;
   timeToHarvest: Date | null;
@@ -133,7 +133,8 @@ interface WerehouseObj{
 interface WerehouseState {
   werehouse: WerehouseObj[] | null;
   getWerehouse: (userId: number) => void;
-  updateWerehouse: (userId: number, seedId: ObjectId, amount: number) => void
+  updateWerehouse: (userId: number, seedId: ObjectId, amount: number) => void;
+  sellWerehouseItem:(werehouseId:ObjectId, userId: number)=>void
 }
 
 interface RatingState {
@@ -309,7 +310,6 @@ export const useRatingStore = create<RatingState>((set) => ({
 export const useWerehouseStore = create<WerehouseState>((set) => ({
   werehouse: null,
   getWerehouse: async (userId) => {
-
       const response = await axios.get("/api/werehouse", {
         params: { userId},
       });
@@ -320,6 +320,14 @@ export const useWerehouseStore = create<WerehouseState>((set) => ({
   },
   updateWerehouse: async (userId, seedId, amount) => {
     const response = await axios.post("/api/werehouse", { userId, seedId, amount});
+    if (response.status === 200) {
+      useWerehouseStore.getState().getWerehouse(userId)
+    }
+  },
+  sellWerehouseItem: async (werehouseId, userId) => {
+    const response = await axios.delete("/api/werehouse", {
+      params: { werehouseId},
+    });
     if (response.status === 200) {
       useWerehouseStore.getState().getWerehouse(userId)
     }

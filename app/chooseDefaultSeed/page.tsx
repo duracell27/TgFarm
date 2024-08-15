@@ -35,7 +35,7 @@ const ChooseDefaultSeed = (props: Props) => {
               key={index}
               onClick={() => handleSetDefaultSeed(seed._id)}
               className={
-                (userData.lvl < seed.lvl ? "bg-slate-700 " : "bg-slate-900 ") +
+                (userData.lvl < seed.lvl ? "bg-slate-700 pointer-events-none" : "bg-slate-900 ") +
                 " flex gap-2 py-1 my-2 rounded-md cursor-pointer"
               }
             >

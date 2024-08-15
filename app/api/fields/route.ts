@@ -94,6 +94,30 @@ export const PUT = async (req: NextRequest) => {
       }
 
       
+
+
+  //     const currentTime = new Date();
+  // const reducedTimeToHarvest = new Date(field.timeToHarvest.getTime() - 10 * 60 * 1000); // Subtract 10 minutes
+
+  // let newStatus = 'waitForFertilize';
+  // let newTimeToHarvest: Date | null = reducedTimeToHarvest;
+
+  // // Check if reducedTimeToHarvest is less than or equal to current time
+  // if (reducedTimeToHarvest <= currentTime) {
+  //   newStatus = 'waitForHarvest';
+  //   newTimeToHarvest = null; // Set timeToHarvest to null if it's time to harvest
+  // }
+
+  // const response = await Field.findOneAndUpdate(
+  //   { _id: fieldId },
+  //   {
+  //     status: newStatus,
+  //     timeToWater: null,
+  //     timeToHarvest: newTimeToHarvest
+  //   }
+  // );
+
+
       
       const reducedTimeToHarvest = new Date(field.timeToHarvest.getTime() - 10 * 60 * 1000); // Subtract 10 minutes
 
@@ -150,27 +174,6 @@ export const PUT = async (req: NextRequest) => {
         }
 
       );
-
-      //add to werehouse
-
-    //   // Check if the seed already exists in the warehouse for the given user
-    // const existingRecord = await Werehouse.findOne({ userId:field.userId, seed: seedId });
-
-    // if (existingRecord) {
-    //   // If it exists, update the amount
-    //   existingRecord.amount += seed.quantity;
-    //   await existingRecord.save();
-    // } else {
-    //   // If it doesn't exist, create a new record
-    //   const newRecord = new Werehouse({
-    //     userId:field.userId,
-    //     seed: seedId,
-    //     amount: seed.quantity,
-    //     type: 'seed',
-    //   });
-    //   await newRecord.save();
-    // }
-
   
       return NextResponse.json({message: 'Field harvested'});
     }else if(fieldUpdateType === 'dig'){

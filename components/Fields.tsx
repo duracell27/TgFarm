@@ -301,10 +301,10 @@ const Fields = (props: Props) => {
                   onClick={() =>
                     handleHarvestField(
                       field._id,
-                      userData.defaultSeed._id,
+                      field.seed._id,
                       "harvest",
                       userData.defaultSoil._id,
-                      userData.defaultSeed.quantity
+                      field.seed.quantity
                     )
                   }
                   className="flex items-center gap-1"

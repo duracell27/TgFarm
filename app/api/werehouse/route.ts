@@ -44,3 +44,12 @@ export const GET = async (req: NextRequest) => {
   
     return NextResponse.json(werehouse);
   };
+
+  export const DELETE = async (req: NextRequest) => {
+    const { searchParams } = new URL(req.url);
+    const werehouseId = searchParams.get("werehouseId");
+  
+    const werehouse = await Werehouse.findOneAndDelete({ _id: werehouseId })
+  
+    return NextResponse.json(werehouse);
+  };
