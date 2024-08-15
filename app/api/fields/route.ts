@@ -7,6 +7,7 @@ import Seed from "@/models/Seed";
 import Soil from "@/models/Soil";
 import { seedEmptyId } from "@/libs/constants";
 import { remainingTime } from "@/libs/workWithTime";
+import Werehouse from "@/models/Werehouse";
 
 interface UpdateFieldType {
   fieldId: ObjectId;
@@ -136,6 +137,7 @@ export const PUT = async (req: NextRequest) => {
       return NextResponse.json({message: 'Field fertilized'});
     }else if(fieldUpdateType === 'harvest'){
   
+      //const field = await Field.findById(fieldId);
 
       const response = await Field.findOneAndUpdate(
         { _id: fieldId },
@@ -149,10 +151,28 @@ export const PUT = async (req: NextRequest) => {
 
       );
 
-      // TODO add to warehouse
+      //add to werehouse
+
+    //   // Check if the seed already exists in the warehouse for the given user
+    // const existingRecord = await Werehouse.findOne({ userId:field.userId, seed: seedId });
+
+    // if (existingRecord) {
+    //   // If it exists, update the amount
+    //   existingRecord.amount += seed.quantity;
+    //   await existingRecord.save();
+    // } else {
+    //   // If it doesn't exist, create a new record
+    //   const newRecord = new Werehouse({
+    //     userId:field.userId,
+    //     seed: seedId,
+    //     amount: seed.quantity,
+    //     type: 'seed',
+    //   });
+    //   await newRecord.save();
+    // }
 
   
-      return NextResponse.json({message: 'Field fertilized'});
+      return NextResponse.json({message: 'Field harvested'});
     }else if(fieldUpdateType === 'dig'){
   
 
@@ -163,10 +183,6 @@ export const PUT = async (req: NextRequest) => {
         }
 
       );
-
-      // TODO add to warehouse
-
-  
       return NextResponse.json({message: 'Field fertilized'});
     }
 

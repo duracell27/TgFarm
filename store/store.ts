@@ -122,6 +122,20 @@ interface LvlState {
   getExpData: (userId: number) => void;
 }
 
+interface WerehouseObj{
+  _id: ObjectId;
+  userId: number,
+    seed: Seed,
+    amount: number
+    type: 'seed'
+}
+
+interface WerehouseState {
+  werehouse: WerehouseObj[] | null;
+  getWerehouse: (userId: number) => void;
+  updateWerehouse: (userId: number, seedId: ObjectId, amount: number) => void
+}
+
 interface RatingState {
   ratingList: User[] | null,
   getRatingList: () => void;
@@ -265,7 +279,7 @@ export const useLvlStore = create<LvlState>((set) => ({
   expToNextLvl: null,
   percent: null,
   getExpData: async (userId) => {
-    const { userData } = useUserStore.getState();
+    
 
     const response = await axios.get("/api/lvl", {
       params: { userId },
@@ -289,4 +303,26 @@ export const useRatingStore = create<RatingState>((set) => ({
       set({ ratingList: response.data });
     }
   },
+}));
+
+
+export const useWerehouseStore = create<WerehouseState>((set) => ({
+  werehouse: null,
+  getWerehouse: async (userId) => {
+
+      const response = await axios.get("/api/werehouse", {
+        params: { userId},
+      });
+      if (response.status === 200) {
+        set({ werehouse: response.data });
+      }
+    
+  },
+  updateWerehouse: async (userId, seedId, amount) => {
+    const response = await axios.post("/api/werehouse", { userId, seedId, amount});
+    if (response.status === 200) {
+      useWerehouseStore.getState().getWerehouse(userId)
+    }
+  }
+  
 }));

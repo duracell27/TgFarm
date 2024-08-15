@@ -1,5 +1,5 @@
 "use client";
-import { useFieldtStore, usePricesStore, useUserStore } from "@/store/store";
+import { useFieldtStore, usePricesStore, useUserStore, useWerehouseStore } from "@/store/store";
 import Image from "next/image";
 import { ObjectId } from "bson";
 import Link from "next/link";
@@ -17,6 +17,7 @@ const Fields = (props: Props) => {
   const updateField = useFieldtStore((state) => state.updateField);
   const updateUserStats = useUserStore((state) => state.updateUserStats);
   const buyField = useFieldtStore((state) => state.buyField);
+  const updateWerehouse = useWerehouseStore(state => state.updateWerehouse)
 
   const handlePlantField = async (
     fieldId: ObjectId,
@@ -80,9 +81,13 @@ const Fields = (props: Props) => {
     fieldId: ObjectId,
     seedId: ObjectId,
     fieldUpdateType: "harvest",
-    soilId: ObjectId
+    soilId: ObjectId,
+    quantity: number
   ) => {
     updateField(fieldId, seedId, fieldUpdateType, soilId);
+    if (userData?.userId){
+      updateWerehouse(userData.userId, seedId, quantity)
+    }
   };
 
   const handleDigField = async (
@@ -298,7 +303,8 @@ const Fields = (props: Props) => {
                       field._id,
                       userData.defaultSeed._id,
                       "harvest",
-                      userData.defaultSoil._id
+                      userData.defaultSoil._id,
+                      userData.defaultSeed.quantity
                     )
                   }
                   className="flex items-center gap-1"

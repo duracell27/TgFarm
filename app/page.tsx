@@ -7,7 +7,9 @@ import {
   useLvlStore,
   usePricesStore,
   useUserStore,
+  useWerehouseStore,
 } from "@/store/store";
+import Link from "next/link";
 import { useEffect } from "react";
 
 export default function Home() {
@@ -16,6 +18,7 @@ export default function Home() {
   const getSeeds = useDefaultStore((state) => state.getSeeds);
   const getSoils = useDefaultStore((state) => state.getSoils);
   const getExpData = useLvlStore((state) => state.getExpData);
+  const getWerehouse = useWerehouseStore((state) => state.getWerehouse)
 
   useEffect(() => {
     getFieldPrices();
@@ -26,13 +29,15 @@ export default function Home() {
   useEffect(()=>{
     if(userData?.userId){
       getExpData(userData.userId);
+      getWerehouse(userData.userId)
     }
   },[userData?.userId])
   return (
     <main className="p-2">
       <Fields />
       <DefaultSeedAndSoil />
-      <hr className="bg-yellow-500 h-[2px]" />
+      <hr className="border-yellow-500 border my-1" />
+      <Link href={'/werehouse'} className="text-yellow-500">склад</Link>
     </main>
   );
 }

@@ -5,8 +5,9 @@ import Seed from "./Seed";
 const WerehouseSchema = new mongoose.Schema(
   {
     userId: Number,
-    seed: { type: mongoose.Schema.Types.ObjectId, ref: Seed.modelName, default: seedEmptyId },
+    seed: { type: mongoose.Schema.Types.ObjectId, ref: Seed.modelName},
     amount: {type: Number,  default: 0},
+    type: {type: String, enum: ['seed']}
   },
   {
     timestamps: true,
