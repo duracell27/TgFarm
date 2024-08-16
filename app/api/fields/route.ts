@@ -6,8 +6,6 @@ import { NextRequest, NextResponse } from "next/server";
 import Seed from "@/models/Seed";
 import Soil from "@/models/Soil";
 import { seedEmptyId } from "@/libs/constants";
-import { remainingTime } from "@/libs/workWithTime";
-import Werehouse from "@/models/Werehouse";
 
 interface UpdateFieldType {
   fieldId: ObjectId;

@@ -4,6 +4,7 @@ import Field from "@/models/Field";
 import { ObjectId } from "bson";
 import { NextRequest, NextResponse } from "next/server";
 import { seedEmptyId } from "@/libs/constants";
+import Convert from "@/models/Convert";
 
 interface UpdateUserRequestData {
   defaultSeedId: ObjectId ; // Use ObjectId for MongoDB, or string if it’s coming as a string
@@ -84,6 +85,11 @@ export const POST = async (req: NextRequest) => {
           status: "waitForPlant",
         },
       ]);
+      // додавання запису для обміну монет
+      await Convert.create({
+        userId: newUser.userId,
+        lastUpdate: new Date()
+      })
       return NextResponse.json(newUser);
     }
   } catch (error) {

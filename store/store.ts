@@ -140,6 +140,19 @@ interface WerehouseState {
 interface RatingState {
   ratingList: User[] | null,
   getRatingList: () => void;
+  
+}
+
+
+interface ConvertState {
+  convertData: {
+    userId: number,
+    converted: number,
+    convertAvaliable: number,
+    lastUpdate: Date
+  } | null,
+  getConvertData: () => void;
+  updateConvertData: () => void;
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
@@ -334,3 +347,22 @@ export const useWerehouseStore = create<WerehouseState>((set) => ({
   }
   
 }));
+
+
+
+export const useConverStore = create<ConvertState>((set) => ({
+  convertData: null,
+  getConvertData: async () => {
+    const response = await axios.get("/api/convert");
+    if (response.status === 200) {
+      set({ convertData: response.data });
+    }
+  },
+  updateConvertData: async () => {
+    const response = await axios.put("/api/convert");
+    if (response.status === 200) {
+      set({ convertData: response.data });
+    }
+  },
+}));
+
