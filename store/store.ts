@@ -151,8 +151,8 @@ interface ConvertState {
     convertAvaliable: number,
     lastUpdate: Date
   } | null,
-  getConvertData: () => void;
-  updateConvertData: () => void;
+  getConvertData: (userId:number) => void;
+  updateConvertData: (userId:number, amount:number, type: "usd-1" | "usd-10" | "gold") => void;
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
@@ -352,16 +352,17 @@ export const useWerehouseStore = create<WerehouseState>((set) => ({
 
 export const useConverStore = create<ConvertState>((set) => ({
   convertData: null,
-  getConvertData: async () => {
-    const response = await axios.get("/api/convert");
+  getConvertData: async (userId) => {
+    const response = await axios.get("/api/convert", {params: {userId}});
     if (response.status === 200) {
       set({ convertData: response.data });
     }
   },
-  updateConvertData: async () => {
-    const response = await axios.put("/api/convert");
+  updateConvertData: async (userId, amount, type) => {
+    const response = await axios.put("/api/convert", {userId, amount, type});
     if (response.status === 200) {
-      set({ convertData: response.data });
+      useConverStore.getState().getConvertData(userId);
+      useUserStore.getState().reNewUser();
     }
   },
 }));
