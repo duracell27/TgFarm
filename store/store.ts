@@ -111,7 +111,8 @@ interface FieldState {
     fieldId: ObjectId,
     seedId: ObjectId,
     fieldUpdateType: "plant" | "water" | "fertilize" | "harvest" | "dig",
-    soilId: ObjectId
+    soilId: ObjectId,
+    userId: number
   ) => void;
   buyField: (userId: number, ordinal: number) => void;
 }
@@ -252,7 +253,7 @@ export const useFieldtStore = create<FieldState>((set, get) => ({
       set({ fields: response.data });
     }
   },
-  updateField: async (fieldId, seedId, fieldUpdateType, soilId) => {
+  updateField: async (fieldId, seedId, fieldUpdateType, soilId, userId) => {
     const { getFields } = get();
     const { userData } = useUserStore.getState();
     const { getExpData } = useLvlStore.getState();
@@ -262,6 +263,7 @@ export const useFieldtStore = create<FieldState>((set, get) => ({
       seedId,
       fieldUpdateType,
       soilId,
+      userId
     });
     if (response.status === 200) {
       if (userData) {

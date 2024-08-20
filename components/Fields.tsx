@@ -19,6 +19,16 @@ const Fields = (props: Props) => {
   const buyField = useFieldtStore((state) => state.buyField);
   const updateWerehouse = useWerehouseStore(state => state.updateWerehouse)
 
+  useEffect(() => {
+    if (userData?.userId) {
+      getFields(userData.userId);
+    }
+  }, [userData?.userId]);
+
+  if (!fields || !userData || !fieldPrices) {
+    return null;
+  }
+
   const handlePlantField = async (
     fieldId: ObjectId,
     seedId: ObjectId,
@@ -33,7 +43,7 @@ const Fields = (props: Props) => {
     if (!moneyCheck) {
       toast.error("");
     } else if (moneyCheck) {
-      updateField(fieldId, seedId, fieldUpdateType, soilId);
+      updateField(fieldId, seedId, fieldUpdateType, soilId, userData?.userId);
     }
   };
 
@@ -49,7 +59,7 @@ const Fields = (props: Props) => {
     if (!moneyCheck) {
       toast.error("");
     } else if (moneyCheck) {
-      updateField(fieldId, seedId, fieldUpdateType, soilId);
+      updateField(fieldId, seedId, fieldUpdateType, soilId, userData?.userId);
     }
   };
 
@@ -73,7 +83,7 @@ const Fields = (props: Props) => {
     if (!moneyCheck) {
       toast.error("");
     } else if (moneyCheck) {
-      updateField(fieldId, seedId, fieldUpdateType, soilId);
+      updateField(fieldId, seedId, fieldUpdateType, soilId, userData?.userId);
     }
   };
 
@@ -84,7 +94,7 @@ const Fields = (props: Props) => {
     soilId: ObjectId,
     quantity: number
   ) => {
-    updateField(fieldId, seedId, fieldUpdateType, soilId);
+    updateField(fieldId, seedId, fieldUpdateType, soilId, userData?.userId);
     if (userData?.userId){
       updateWerehouse(userData.userId, seedId, quantity)
     }
@@ -103,7 +113,7 @@ const Fields = (props: Props) => {
     if (!moneyCheck) {
       toast.error("");
     } else if (moneyCheck) {
-      updateField(fieldId, seedId, fieldUpdateType, soilId);
+      updateField(fieldId, seedId, fieldUpdateType, soilId, userData?.userId);
     }
   };
 
@@ -121,15 +131,9 @@ const Fields = (props: Props) => {
     }
   };
 
-  useEffect(() => {
-    if (userData?.userId) {
-      getFields(userData.userId);
-    }
-  }, [userData?.userId]);
+  
 
-  if (!fields || !userData || !fieldPrices) {
-    return null;
-  }
+ 
   const nextFieldPrice:number | null = fieldPrices.find((item) => item.ordinal === fields.length + 1)?.costUsd ?? null;
 
   return (

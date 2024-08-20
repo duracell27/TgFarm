@@ -5,13 +5,15 @@ import { ObjectId } from "bson";
 import { NextRequest, NextResponse } from "next/server";
 import Seed from "@/models/Seed";
 import Soil from "@/models/Soil";
-import { seedEmptyId } from "@/libs/constants";
+import { achiveLvls, seedEmptyId } from "@/libs/constants";
+import Achive from "@/models/Achive";
 
 interface UpdateFieldType {
   fieldId: ObjectId;
   seedId: ObjectId;
-  fieldUpdateType: 'plant' | 'water';
+  fieldUpdateType: "plant" | "water";
   soilId: ObjectId;
+  userId: number;
 }
 
 export const GET = async (req: NextRequest) => {
@@ -24,11 +26,14 @@ export const GET = async (req: NextRequest) => {
       .populate("seed")
       .sort({ ordinalNumber: "asc" });
 
-      const now = new Date();
+    const now = new Date();
 
     const updatedFields = await Promise.all(
       fields.map(async (field) => {
-        if( field.timeToHarvest !== null && (now > new Date(field.timeToHarvest))) {
+        if (
+          field.timeToHarvest !== null &&
+          now > new Date(field.timeToHarvest)
+        ) {
           field.status = "waitForHarvest";
 
           await field.save(); // Save the updated field
@@ -36,6 +41,8 @@ export const GET = async (req: NextRequest) => {
         return field;
       })
     );
+    // для тесту ачівок
+    // await Achive.create({userId})
 
     return NextResponse.json(fields, { status: 200 });
   } catch (error) {
@@ -48,166 +55,169 @@ export const GET = async (req: NextRequest) => {
 };
 
 export const PUT = async (req: NextRequest) => {
-
   const data: UpdateFieldType = await req.json();
-  const { fieldId, seedId, fieldUpdateType, soilId } = data;
+  const { fieldId, seedId, fieldUpdateType, soilId, userId } = data;
   try {
     await connectDB();
     const seed = await Seed.findById(seedId);
 
+    if (!seed) {
+      return NextResponse.json({ error: "Seed not found" }, { status: 404 });
+    }
 
-      if (!seed) {
-        return NextResponse.json({ error: 'Seed not found' }, { status: 404 });
-      }
-
-
-
-
-    if(fieldUpdateType === 'plant'){
+    if (fieldUpdateType === "plant") {
       // Calculate timeToWater and timeToFertilize
-     
+
       const now = new Date();
       const timeToWater = new Date(now.getTime() + 2 * 60 * 1000); // 2 minutes from now
-      const timeToFertilize = new Date(now.getTime() + (seed.timeToFertilize + 120) * 1000); // seed.timeToFertilize seconds from now
+      const timeToFertilize = new Date(
+        now.getTime() + (seed.timeToFertilize + 120) * 1000
+      ); // seed.timeToFertilize seconds from now
       const timeToHarvest = new Date(now.getTime() + seed.timeToHarvest * 1000);
-   
-       const response = await Field.findOneAndUpdate(
+
+      const response = await Field.findOneAndUpdate(
         { _id: fieldId },
         {
           seed: seedId,
-          status: 'waitForWater',
+          status: "waitForWater",
           timeToWater: timeToWater,
           timeToFertilize: timeToFertilize,
-          timeToHarvest: timeToHarvest
+          timeToHarvest: timeToHarvest,
         }
-
       );
-  
-      return NextResponse.json({message: 'Field planted'});
-    }else if(fieldUpdateType === 'water'){
 
+      return NextResponse.json({ message: "Field planted" });
+    } else if (fieldUpdateType === "water") {
       const field = await Field.findById(fieldId);
       if (!field) {
-        return NextResponse.json({ error: 'Field not found' }, { status: 404 });
+        return NextResponse.json({ error: "Field not found" }, { status: 404 });
       }
 
-      
-
-
-  //     const currentTime = new Date();
-  // const reducedTimeToHarvest = new Date(field.timeToHarvest.getTime() - 10 * 60 * 1000); // Subtract 10 minutes
-
-  // let newStatus = 'waitForFertilize';
-  // let newTimeToHarvest: Date | null = reducedTimeToHarvest;
-
-  // // Check if reducedTimeToHarvest is less than or equal to current time
-  // if (reducedTimeToHarvest <= currentTime) {
-  //   newStatus = 'waitForHarvest';
-  //   newTimeToHarvest = null; // Set timeToHarvest to null if it's time to harvest
-  // }
-
-  // const response = await Field.findOneAndUpdate(
-  //   { _id: fieldId },
-  //   {
-  //     status: newStatus,
-  //     timeToWater: null,
-  //     timeToHarvest: newTimeToHarvest
-  //   }
-  // );
-
-
-      
-      const reducedTimeToHarvest = new Date(field.timeToHarvest.getTime() - 10 * 60 * 1000); // Subtract 10 minutes
-
+      const reducedTimeToHarvest = new Date(
+        field.timeToHarvest.getTime() - 10 * 60 * 1000
+      ); // Subtract 10 minutes
 
       const response = await Field.findOneAndUpdate(
         { _id: fieldId },
         {
-          status: 'waitForFertilize',
+          status: "waitForFertilize",
           timeToWater: null,
-          timeToHarvest: reducedTimeToHarvest
+          timeToHarvest: reducedTimeToHarvest,
         }
-
       );
-  
-      return NextResponse.json({message: 'Field watered'});
-    }else if(fieldUpdateType === 'fertilize'){
 
-      const soil = await Soil.findById(soilId)
-      if (!soil) {
-        return NextResponse.json({ error: 'Soil not found' }, { status: 404 });
+      // апдейт досягнень початок
+      const achive = await Achive.findOne({ userId });
+      achive.vodoliy.count += 1;
+      if (achive.vodoliy.count >= achiveLvls.vodoliy[achive.vodoliy.lvl + 1]) {
+        achive.vodoliy.lvl += 1;
+        achive.achiveCount += 1;
       }
 
+      await achive.save();
+      // апдейт досягнень кінець
+
+      return NextResponse.json({ message: "Field watered" });
+    } else if (fieldUpdateType === "fertilize") {
+      const soil = await Soil.findById(soilId);
+      if (!soil) {
+        return NextResponse.json({ error: "Soil not found" }, { status: 404 });
+      }
 
       const field = await Field.findById(fieldId);
       if (!field) {
-        return NextResponse.json({ error: 'Field not found' }, { status: 404 });
+        return NextResponse.json({ error: "Field not found" }, { status: 404 });
       }
 
-
-      const reducedTimeToHarvest = new Date(field.timeToHarvest.getTime() - soil.reduceTime * 1000); // Subtract 10 minutes
-
+      const reducedTimeToHarvest = new Date(
+        field.timeToHarvest.getTime() - soil.reduceTime * 1000
+      ); // Subtract 10 minutes
 
       const response = await Field.findOneAndUpdate(
         { _id: fieldId },
         {
-          status: 'waitForHarvest',
-          timeToHarvest: reducedTimeToHarvest
+          status: "waitForHarvest",
+          timeToHarvest: reducedTimeToHarvest,
         }
       );
-  
-      return NextResponse.json({message: 'Field fertilized'});
-    }else if(fieldUpdateType === 'harvest'){
-  
+
+      // апдейт досягнень початок
+      const achive = await Achive.findOne({ userId });
+      achive.agronom.count += 1;
+      if (achive.agronom.count >= achiveLvls.agronom[achive.agronom.lvl + 1]) {
+        achive.agronom.lvl += 1;
+        achive.achiveCount += 1;
+      }
+
+      await achive.save();
+      // апдейт досягнень кінець
+
+      return NextResponse.json({ message: "Field fertilized" });
+    } else if (fieldUpdateType === "harvest") {
       //const field = await Field.findById(fieldId);
 
       const response = await Field.findOneAndUpdate(
         { _id: fieldId },
         {
-          status: 'waitForDig',
+          status: "waitForDig",
           timeToHarvest: null,
-          timeToFertilize:null,
-          timeToWater:null,
+          timeToFertilize: null,
+          timeToWater: null,
           seed: seedEmptyId,
         }
-
       );
-  
-      return NextResponse.json({message: 'Field harvested'});
-    }else if(fieldUpdateType === 'dig'){
-  
 
+      // апдейт досягнень початок
+      const achive = await Achive.findOne({ userId });
+      achive.sadovid.count += 1;
+      if (achive.sadovid.count >= achiveLvls.sadovid[achive.sadovid.lvl + 1]) {
+        achive.sadovid.lvl += 1;
+        achive.achiveCount += 1;
+      }
+
+      await achive.save();
+      // апдейт досягнень кінець
+
+      return NextResponse.json({ message: "Field harvested" });
+    } else if (fieldUpdateType === "dig") {
       const response = await Field.findOneAndUpdate(
         { _id: fieldId },
         {
-          status: 'waitForPlant',
+          status: "waitForPlant",
         }
-
       );
-      return NextResponse.json({message: 'Field fertilized'});
+      return NextResponse.json({ message: "Field fertilized" });
     }
-
-    
   } catch (error) {
     console.log("from user api post", error);
   }
 };
 
 export const POST = async (req: NextRequest) => {
-
-  const data= await req.json();
-  const { userId, ordinal} = data;
+  const data = await req.json();
+  const { userId, ordinal } = data;
 
   try {
     await connectDB();
     await Field.create({
       userId: userId,
       ordinalNumber: ordinal,
-      status: 'waitForPlant',
+      status: "waitForPlant",
       seed: seedEmptyId,
-    })
-   
-    return NextResponse.json({message: 'Bought field'}, { status: 200 });
+    });
+
+    // апдейт досягнень початок
+    const achive = await Achive.findOne({ userId });
+    achive.zemlevlasnyk.count += 1;
+    if (achive.zemlevlasnyk.count >= achiveLvls.zemlevlasnyk[achive.zemlevlasnyk.lvl + 1]) {
+      achive.zemlevlasnyk.lvl += 1;
+      achive.achiveCount += 1;
+    }
+
+    await achive.save();
+    // апдейт досягнень кінець
+
+    return NextResponse.json({ message: "Bought field" }, { status: 200 });
   } catch (error) {
     console.log(error);
     return NextResponse.json(
@@ -215,5 +225,4 @@ export const POST = async (req: NextRequest) => {
       { status: 500 }
     );
   }
-
-}
+};
