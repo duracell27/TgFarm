@@ -140,10 +140,8 @@ interface WerehouseState {
 
 interface RatingState {
   ratingList: User[] | null,
-  getRatingList: () => void;
-  
+  getRatingList: () => void; 
 }
-
 
 interface ConvertState {
   convertData: {
@@ -154,6 +152,37 @@ interface ConvertState {
   } | null,
   getConvertData: (userId:number) => void;
   updateConvertData: (userId:number, amount:number, type: "usd-1" | "usd-10" | "gold") => void;
+}
+
+interface Achive{
+  userId: number,
+  sadovid: {
+    count: number,
+    lvl: number
+  },
+  vodoliy: {
+    count: number,
+    lvl: number
+  },
+  agronom: {
+    count: number,
+    lvl: number,
+  },
+  zemlevlasnyk: {
+    count: number,
+    lvl: number,
+  },
+  mehanizator: {
+    count: number,
+    lvl: number,
+  },
+  achiveCount: number,
+}
+
+interface AchiveState {
+  achives: Achive | null,
+  getAchives: (userId: number) => void;
+  
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
@@ -369,3 +398,12 @@ export const useConverStore = create<ConvertState>((set) => ({
   },
 }));
 
+export const useAchivesStore = create<AchiveState>((set) => ({
+  achives: null,
+  getAchives: async (userId) => {
+    const response = await axios.get("/api/achive", {params: {userId}});
+    if (response.status === 200) {
+      set({ achives: response.data });
+    }
+  }
+}));

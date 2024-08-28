@@ -3,6 +3,7 @@
 import DefaultSeedAndSoil from "@/components/DefaultSeedAndSoil";
 import Fields from "@/components/Fields";
 import {
+  useAchivesStore,
   useConverStore,
   useDefaultStore,
   useLvlStore,
@@ -21,6 +22,7 @@ export default function Home() {
   const getExpData = useLvlStore((state) => state.getExpData);
   const getWerehouse = useWerehouseStore((state) => state.getWerehouse)
   const getConvertData = useConverStore((state) => state.getConvertData);
+  const getAchives = useAchivesStore((state) => state.getAchives);
 
   useEffect(() => {
     getFieldPrices();
@@ -33,6 +35,7 @@ export default function Home() {
       getExpData(userData.userId);
       getWerehouse(userData.userId);
       getConvertData(userData.userId);
+      getAchives(userData.userId);
     }
   },[userData?.userId])
   return (

@@ -63,7 +63,7 @@ const ChooseDefaultSeed = (props: Props) => {
                         height={16}
                         alt="gold"
                       />{" "}
-                      {seed.price}
+                      {seed.price }
                     </span>
                   )}
                 </p>
@@ -81,7 +81,7 @@ const ChooseDefaultSeed = (props: Props) => {
                         height={16}
                         alt="exp"
                       />
-                      {seed.profit}
+                      {seed.profit * seed.quantity}
                       {", "}
                     </span>
                     <span className="flex items-center gap-1">

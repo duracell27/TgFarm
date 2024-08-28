@@ -2,8 +2,10 @@ import connectDB from "@/libs/connectDb";
 import Seed from "@/models/Seed";
 import { NextRequest, NextResponse } from "next/server";
 
+const seeds = []
+
 export const POST = async (req: NextRequest) => {
-    const data = await req.json();
+     const data = await req.json();
    
     try {
         await connectDB()
